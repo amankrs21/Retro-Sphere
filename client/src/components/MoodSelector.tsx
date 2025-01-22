@@ -1,21 +1,26 @@
 import React from 'react';
 import { Button, Grid, Typography } from '@mui/material';
 
-const MoodSelector: React.FC<{ setMood: React.Dispatch<React.SetStateAction<string>> }> = ({ setMood }) => {
+interface MoodSelectorProps {
+    mood: string;
+    updateMood: (mood: string) => void;
+}
+
+const MoodSelector: React.FC<MoodSelectorProps> = ({ mood, updateMood }) => {
     const moods = ['😀', '🙂', '😐', '😞', '😡'];
 
     return (
         <div>
             <Typography variant="h6">How do you feel about the sprint?</Typography>
             <Grid container spacing={2}>
-                {moods.map((mood, index) => (
-                    <Grid item key={index}>
+                {moods.map((emoji) => (
+                    <Grid item key={emoji}>
                         <Button
-                            variant="outlined"
-                            onClick={() => setMood(mood)}
+                            variant={emoji === mood ? 'contained' : 'outlined'}
+                            onClick={() => updateMood(emoji)}
                             style={{ fontSize: '2rem', minWidth: '60px' }}
                         >
-                            {mood}
+                            {emoji}
                         </Button>
                     </Grid>
                 ))}

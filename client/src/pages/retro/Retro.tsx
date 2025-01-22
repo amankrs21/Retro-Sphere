@@ -1,64 +1,65 @@
 import React, { useState } from 'react';
-import { Button, TextField, Grid, Typography } from '@mui/material';
+import Grid from '@mui/material/Grid2';
+import { Typography, Button, TextField } from '@mui/material';
+import { useWebSocket } from '../../hooks/useWebSocket';
+import RetroColumn from '../../components/RetroColumn';
 import MoodSelector from '../../components/MoodSelector';
 
 const RetroPage: React.FC = () => {
-    const [mood, setMood] = useState<string>('');
-    const [thoughts, setThoughts] = useState<string>('');
-    const [start, setStart] = useState<string>('');
-    const [stop, setStop] = useState<string>('');
-    const [appreciation, setAppreciation] = useState<string>('');
+    const { retroBoardData, updateMood, updateColumn } = useWebSocket('ws://localhost:3000');
+    const [appreciationText, setAppreciationText] = useState('');
 
-    const handleSubmit = () => {
-        // Handle submission logic (e.g., WebSocket, API call)
-        console.log({ mood, thoughts, start, stop, appreciation });
+    const handleAppreciationSubmit = () => {
+        updateColumn('appreciation', appreciationText);
+        setAppreciationText('');
     };
 
     return (
         <div>
             <Typography variant="h4" gutterBottom>
-                Sprint Retrospective
+                Sprint Retrospective - Retro Sphere
             </Typography>
+
+            <MoodSelector mood={retroBoardData.mood} updateMood={updateMood} />
+
             <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <MoodSelector setMood={setMood} />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="Thoughts on Sprint"
-                        multiline
-                        fullWidth
-                        value={thoughts}
-                        onChange={(e) => setThoughts(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="What should we start?"
-                        fullWidth
-                        value={start}
-                        onChange={(e) => setStart(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="What should we stop?"
-                        fullWidth
-                        value={stop}
-                        onChange={(e) => setStop(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
+                <RetroColumn
+                    title="Start Doing"
+                    data={retroBoardData.startDoing}
+                    updateColumn={(text: string) => updateColumn('startDoing', text)}
+                />
+                <RetroColumn
+                    title="Stop Doing"
+                    data={retroBoardData.stopDoing}
+                    updateColumn={(text: string) => updateColumn('stopDoing', text)}
+                />
+                <RetroColumn
+                    title="Continue Doing"
+                    data={retroBoardData.continueDoing}
+                    updateColumn={(text: string) => updateColumn('continueDoing', text)}
+                />
+                <RetroColumn
+                    title="Appreciation"
+                    data={retroBoardData.appreciation}
+                    updateColumn={(text: string) => updateColumn('appreciation', text)}
+                />
+            </Grid>
+
+            <Grid container spacing={3} style={{ marginTop: '20px' }}>
+                <Grid size={{ xs: 12 }}>
                     <TextField
                         label="Appreciation"
                         fullWidth
-                        value={appreciation}
-                        onChange={(e) => setAppreciation(e.target.value)}
+                        value={appreciationText}
+                        onChange={(e) => setAppreciationText(e.target.value)}
                     />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button variant="contained" color="primary" onClick={handleSubmit}>
-                        Submit Feedback
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleAppreciationSubmit}
+                        style={{ marginTop: '10px' }}
+                    >
+                        Add Appreciation
                     </Button>
                 </Grid>
             </Grid>

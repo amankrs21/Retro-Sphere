@@ -1,7 +1,21 @@
 import { useEffect, useState } from 'react';
 
+interface RetroBoardData {
+    mood: string;
+    startDoing: string[];
+    stopDoing: string[];
+    continueDoing: string[];
+    appreciation: string[];
+}
+
 export const useWebSocket = (url: string) => {
-    const [messages, setMessages] = useState<string[]>([]);
+    const [retroBoardData, setRetroBoardData] = useState<RetroBoardData>({
+        mood: '',
+        startDoing: [],
+        stopDoing: [],
+        continueDoing: [],
+        appreciation: []
+    });
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     useEffect(() => {
@@ -14,7 +28,8 @@ export const useWebSocket = (url: string) => {
 
         socket.onmessage = (event) => {
             console.log('Message from server:', event.data);
-            setMessages((prev) => [...prev, event.data]);
+            const data = JSON.parse(event.data);
+            setRetroBoardData(data);
         };
 
         socket.onclose = () => {
@@ -32,5 +47,17 @@ export const useWebSocket = (url: string) => {
         }
     };
 
-    return { messages, sendMessage };
+    // Function to update mood
+    const updateMood = (mood: string) => {
+        const message = JSON.stringify({ type: 'updateMood', mood });
+        sendMessage(message);
+    };
+
+    // Function to update columns
+    const updateColumn = (column: string, text: string) => {
+        const message = JSON.stringify({ type: 'updateColumn', column, text });
+        sendMessage(message);
+    };
+
+    return { retroBoardData, updateMood, updateColumn };
 };
