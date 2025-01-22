@@ -1,31 +1,50 @@
-import React, { useState } from 'react';
+import './Retro.css';
+// import React, { useState } from 'react';
 import Grid from '@mui/material/Grid2';
-import { Typography, Button, TextField } from '@mui/material';
+import { Typography, Container, Divider } from '@mui/material';
 import { useWebSocket } from '../../hooks/useWebSocket';
-import RetroColumn from '../../components/RetroColumn';
-import MoodSelector from '../../components/MoodSelector';
+import RetroColumn from './RetroComment';
+import RetroMood from './RetroMood';
 
 const RetroPage: React.FC = () => {
     const { retroBoardData, updateMood, updateColumn } = useWebSocket('ws://localhost:3000');
-    const [appreciationText, setAppreciationText] = useState('');
+    // const [appreciationText, setAppreciationText] = useState('');
 
-    const handleAppreciationSubmit = () => {
-        updateColumn('appreciation', appreciationText);
-        setAppreciationText('');
+    // const handleAppreciationSubmit = () => {
+    //     updateColumn('appreciation', appreciationText);
+    //     setAppreciationText('');
+    // };
+
+    const tempData = {
+        startDoing: ['Add more tests', 'Improve documentation'],
+        stopDoing: ['Stop doing things that are not needed'],
+        continueDoing: ['Keep up the good work'],
+        appreciation: ['Thanks for helping me out']
     };
 
     return (
-        <div>
-            <Typography variant="h4" gutterBottom>
-                Sprint Retrospective - Retro Sphere
-            </Typography>
+        <Container maxWidth="lg">
+            <div className='retro-header'>
+                <div className='retro-header-title'>
+                    <Typography variant="h4" gutterBottom>
+                        PIM Essentials Retro Board
+                    </Typography>
+                    <Typography variant='subtitle1' gutterBottom>
+                        How do you feel about the sprint?
+                    </Typography>
+                </div>
+                <div>
+                    <RetroMood mood={retroBoardData.mood} updateMood={updateMood} />
+                </div>
+            </div>
 
-            <MoodSelector mood={retroBoardData.mood} updateMood={updateMood} />
 
-            <Grid container spacing={3}>
+            <Divider />
+
+            <Grid container spacing={3} mt={3}>
                 <RetroColumn
                     title="Start Doing"
-                    data={retroBoardData.startDoing}
+                    data={tempData.startDoing}
                     updateColumn={(text: string) => updateColumn('startDoing', text)}
                 />
                 <RetroColumn
@@ -45,25 +64,7 @@ const RetroPage: React.FC = () => {
                 />
             </Grid>
 
-            <Grid container spacing={3} style={{ marginTop: '20px' }}>
-                <Grid size={{ xs: 12 }}>
-                    <TextField
-                        label="Appreciation"
-                        fullWidth
-                        value={appreciationText}
-                        onChange={(e) => setAppreciationText(e.target.value)}
-                    />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleAppreciationSubmit}
-                        style={{ marginTop: '10px' }}
-                    >
-                        Add Appreciation
-                    </Button>
-                </Grid>
-            </Grid>
-        </div>
+        </Container>
     );
 };
 

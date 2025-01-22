@@ -1,0 +1,51 @@
+.retro-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.retro-header-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.retro-comment-card {
+    padding: 0 !important;
+    position: relative !important;
+    background: #f5f5f5 !important;
+}
+
+.retro-comment-card-header {
+    color: white;
+    padding: 5px !important;
+    text-align: center !important;
+    margin-bottom: 5px !important;
+    background: #1565c0 !important;
+}
+
+.retro-comment-cardcontent {
+    padding: 4px 5px !important;
+}
+
+.retro-comment-card-actions {
+    right: 0 !important;
+    bottom: 0 !important;
+    opacity: 0.5 !important;
+    display: flex !important;
+    position: absolute !important;
+    transition: opacity 0.3s !important;
+}
+
+.retro-comment-card-actions:hover {
+    opacity: 1 !important;
+}
+
+.retro-comment-card-item {
+    cursor: pointer !important;
+    padding: 5px;
+
+    .author {
+        font-weight: bold;
+        text-align: end;
+    }
+}
