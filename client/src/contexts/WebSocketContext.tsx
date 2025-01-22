@@ -8,9 +8,13 @@ interface RetroBoardData {
     appreciation: string[];
 }
 
-const WebSocketContext = createContext<any>(null);
+const WebSocketContext = createContext<unknown>(null);
 
-export const WebSocketProvider: React.FC = ({ children }) => {
+interface WebSocketProviderProps {
+    children: React.ReactNode;
+}
+
+export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
     const [retroBoardData, setRetroBoardData] = useState<RetroBoardData>({
         mood: '',
         startDoing: [],
