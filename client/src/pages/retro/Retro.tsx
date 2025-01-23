@@ -1,68 +1,70 @@
-import React, { useState } from 'react';
-import { Button, TextField, Grid, Typography } from '@mui/material';
-import MoodSelector from '../../components/MoodSelector';
+import './Retro.css';
+// import React, { useState } from 'react';
+import Grid from '@mui/material/Grid2';
+import { Typography, Container, Divider } from '@mui/material';
+import { useWebSocket } from '../../hooks/useWebSocket';
+import RetroColumn from './RetroComment';
+import RetroMood from './RetroMood';
 
 const RetroPage: React.FC = () => {
-    const [mood, setMood] = useState<string>('');
-    const [thoughts, setThoughts] = useState<string>('');
-    const [start, setStart] = useState<string>('');
-    const [stop, setStop] = useState<string>('');
-    const [appreciation, setAppreciation] = useState<string>('');
+    const { retroBoardData, updateMood, updateColumn } = useWebSocket('ws://localhost:3000');
+    // const [appreciationText, setAppreciationText] = useState('');
 
-    const handleSubmit = () => {
-        // Handle submission logic (e.g., WebSocket, API call)
-        console.log({ mood, thoughts, start, stop, appreciation });
+    // const handleAppreciationSubmit = () => {
+    //     updateColumn('appreciation', appreciationText);
+    //     setAppreciationText('');
+    // };
+
+    const tempData = {
+        startDoing: ['Add more tests', 'Improve documentation'],
+        stopDoing: ['Stop doing things that are not needed'],
+        continueDoing: ['Keep up the good work'],
+        appreciation: ['Thanks for helping me out']
     };
 
     return (
-        <div>
-            <Typography variant="h4" gutterBottom>
-                Sprint Retrospective
-            </Typography>
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <MoodSelector setMood={setMood} />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="Thoughts on Sprint"
-                        multiline
-                        fullWidth
-                        value={thoughts}
-                        onChange={(e) => setThoughts(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="What should we start?"
-                        fullWidth
-                        value={start}
-                        onChange={(e) => setStart(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="What should we stop?"
-                        fullWidth
-                        value={stop}
-                        onChange={(e) => setStop(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        label="Appreciation"
-                        fullWidth
-                        value={appreciation}
-                        onChange={(e) => setAppreciation(e.target.value)}
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <Button variant="contained" color="primary" onClick={handleSubmit}>
-                        Submit Feedback
-                    </Button>
-                </Grid>
+        <Container maxWidth="lg">
+            <div className='retro-header'>
+                <div className='retro-header-title'>
+                    <Typography variant="h4" gutterBottom>
+                        PIM Essentials Retro Board
+                    </Typography>
+                    <Typography variant='subtitle1' gutterBottom>
+                        How do you feel about the sprint?
+                    </Typography>
+                </div>
+                <div>
+                    <RetroMood mood={retroBoardData.mood} updateMood={updateMood} />
+                </div>
+            </div>
+
+
+            <Divider />
+
+            <Grid container spacing={3} mt={3}>
+                <RetroColumn
+                    title="Start Doing"
+                    data={tempData.startDoing}
+                    updateColumn={(text: string) => updateColumn('startDoing', text)}
+                />
+                <RetroColumn
+                    title="Stop Doing"
+                    data={retroBoardData.stopDoing}
+                    updateColumn={(text: string) => updateColumn('stopDoing', text)}
+                />
+                <RetroColumn
+                    title="Continue Doing"
+                    data={retroBoardData.continueDoing}
+                    updateColumn={(text: string) => updateColumn('continueDoing', text)}
+                />
+                <RetroColumn
+                    title="Appreciation"
+                    data={retroBoardData.appreciation}
+                    updateColumn={(text: string) => updateColumn('appreciation', text)}
+                />
             </Grid>
-        </div>
+
+        </Container>
     );
 };
 
