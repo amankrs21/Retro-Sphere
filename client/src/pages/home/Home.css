@@ -1,0 +1,27 @@
+.custom-home-text {
+    text-decoration: none;
+    font-weight: bold !important;
+    color: #1976d2 !important;
+}
+
+.home-group {
+    margin: 10px;
+    padding: 10px;
+}
+
+.home-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.table-row:hover {
+    background-color: #f3f3f3 !important;
+}
+
+.table-cell-group-name {
+    cursor: pointer;
+    color: #1976d2 !important;
+    font-weight: bold !important;
+}
