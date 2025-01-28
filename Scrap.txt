@@ -38,3 +38,42 @@ server/
 ├── package.json          # Dependencies and scripts
 ├── .env                  # Environment variables
 └── .gitignore            # Ignored files and folders
+
+
+
+=> Retro JSON format
+{
+  "emojis": {
+    "A": {
+      "users": ["user1@email.com","user2@email.com","user3@email.com"]
+    },
+    "B": {
+      "users": ["user4@email.com"]
+    },
+    "C": {
+        "users": []
+    },
+    "D": {
+      "users": ["user5@email.com","user6@email.com"]
+    },
+    "E": {
+      "users": ["user7@email.com"]
+    }
+  },
+  "comments": {
+    "startDoing": [
+      {
+        "comment": "Start Doing Text",
+        "createdBy": "user1@email.com"
+      }
+    ],
+    "stopDoing": [
+      {
+        "comment": "Stop Doing Text",
+        "createdBy": "user3@email.com"
+      }
+    ],
+    "continueDoing": [],
+    "appreciation": []
+  }
+}
