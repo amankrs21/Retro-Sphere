@@ -1,4 +1,3 @@
-require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
 
@@ -16,23 +15,13 @@ app.disable("x-powered-by");
 app.use(express.json());
 
 
-// Check if all the necessary environment keys are provided
-const requiredEnvVars = ["MONGO_URL", "GOOGLE_CLIENT_ID", "JWT_SECRET"];
-requiredEnvVars.forEach((key) => {
-    if (!process.env[key]) {
-        console.error(`Missing environment variable: ${key}`);
-        process.exit(1);
-    }
-});
-
-
 // Connect to the database
 mongoConnect();
 
 
 // Middleware to log all requests
 app.use((req, res, next) => {
-    if (req.method !== "OPTIONS" && process.env.NODE_ENV === "development") {
+    if (req.method !== "OPTIONS" || process.env.NODE_ENV === "development") {
         console.info(`${Date().slice(4, 24)} [${req.method}] http://${req.ip}${req.url}`);
     }
     next();
@@ -40,16 +29,10 @@ app.use((req, res, next) => {
 
 
 // Configure CORS
-const allowedOrigins = process.env.NODE_ENV === "development"
-    ? [
-        "http://localhost:5173",
-        "http://192.168.1.39:5173"
-    ] : [
-        "http://localhost:5173",
-        "https://securevault.pages.dev",
-        "https://dev.securevault.pages.dev"
-    ];
-
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://192.168.1.39:5173"
+];
 const corsOptions = {
     credentials: true,
     origin: allowedOrigins,

@@ -1,5 +1,6 @@
 const express = require("express");
 const { googleLogin } = require("../controller/auth.controller");
+const { retroDataModel } = require("../controller/retro.controller");
 
 const router = express.Router();
 
@@ -12,6 +13,10 @@ router.get("/health", (req, res) => {
 
 // auth google route
 router.post("/auth/google-login", googleLogin);
+
+
+// retro routes
+router.get("/retro", retroDataModel);
 
 
 module.exports = router;
