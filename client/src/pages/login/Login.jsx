@@ -1,26 +1,37 @@
-import axios from 'axios';
 import Grid from '@mui/material/Grid2';
 import { Button, Typography } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
 import Typewriter from "typewriter-effect";
 import LoginIcon from '@mui/icons-material/Login';
 
 import './Login.css';
+import { useLoading } from '../../hooks/useLoading';
+import AuthProvider from '../../middleware/AuthProvider';
 
 
 export default function Login() {
 
     const navigate = useNavigate();
+    const { setLoading } = useLoading();
+    const { http, isValidToken } = AuthProvider();
+
+    useEffect(() => {
+        (async () => {
+            const token = localStorage.getItem('token') || null;
+            if (token && await isValidToken(token)) { navigate('/home'); }
+        })();
+    }, [navigate]);
 
     const responseGoogle = async (authResult) => {
         try {
-            console.log(authResult);
+            setLoading(true);
             if (authResult["code"]) {
-                const response = await axios.post('http://localhost:3000/api/auth/google-login', {
-                    token: authResult["code"]
-                });
+                const response = await http.post('/auth/google-login', { token: authResult["code"] });
                 localStorage.setItem('token', response?.data?.token);
+                toast.success(response?.data?.message);
                 navigate('/home');
             } else {
                 console.log(authResult);
@@ -28,7 +39,7 @@ export default function Login() {
             }
         } catch (e) {
             console.log('Error while Google Login...', e);
-        }
+        } finally { setLoading(false); }
     };
 
     const googleLogin = useGoogleLogin({
@@ -42,7 +53,7 @@ export default function Login() {
             <Grid
                 size={{ xs: false, sm: false, md: 7 }}
                 sx={{
-                    backgroundImage: 'url(./login2.jpg)',
+                    backgroundImage: 'url(./login.jpg)',
                     backgroundRepeat: 'no-repeat',
                     backgroundColor: (t) =>
                         t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],

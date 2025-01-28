@@ -1,21 +1,22 @@
 import Grid from '@mui/material/Grid2';
 import {
-    Button, Container, Divider, Typography, Paper, Table,
-    TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Tooltip,
-    Card
+    Button, Card, Container, Divider, Typography, Paper, Table,
+    TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
 } from "@mui/material";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 import './Home.css';
+import AuthProvider from '../../middleware/AuthProvider';
 
 export default function Home() {
-    let userName = localStorage.getItem('userName') ?? '';
+
+    document.title = "Retro | Home";
+    const { userData } = AuthProvider();
 
     return (
         <Container maxWidth="xl">
-            <Typography pt={2} variant="h4" align="center" gutterBottom>
-                👋 Hello {userName ? userName.split(' ')[0] : "Guest"},
+            <Typography variant="h4" align="center" gutterBottom>
+                👋 Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
                 Welcome to <b className='custom-home-text'>Retro-Sphere!</b> 🚀
             </Typography>
 
