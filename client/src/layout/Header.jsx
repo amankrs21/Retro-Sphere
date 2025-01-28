@@ -177,13 +177,13 @@ import DescriptionIcon from '@mui/icons-material/Description';
 
 import './Header.css';
 import LogoutPop from '../components/LogoutPop';
-// import AuthProvider from '../../middleware/AuthProvider';
+import AuthProvider from '../middleware/AuthProvider';
 
 
 export default function Header() {
     const navigate = useNavigate();
     const location = useLocation();
-    // const { userName } = AuthProvider();
+    const { userData } = AuthProvider();
     const [open, setOpen] = useState(false);
     const [popUser, setPopUser] = useState(null);
     const [openLogout, setOpenLogout] = useState(false);
@@ -248,7 +248,7 @@ export default function Header() {
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt={"userName"} src={`https://robohash.org/${"userName"}`} className='profileAvt' />
+                                <Avatar alt={userData?.name} src={userData?.image} className='profileAvt' />
                             </IconButton>
                         </Tooltip>
                         <Menu

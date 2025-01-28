@@ -5,9 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 
 // Use environment variables for base URL
-const baseURL = import.meta.env?.MODE === "development"
-    ? window.location.origin.replace(":5173", ":3000") + "/api/"
-    : import.meta.env?.VITE_API_URL || "https://secure-vault.azurewebsites.net/api/";
+const baseURL = "http://192.168.1.39:3000/api";
+const baseWSURL = "ws://192.168.1.39:3001"
 
 
 // Axios instance with default configurations
@@ -40,7 +39,7 @@ http.interceptors.response.use(
 export default function AuthProvider() {
     const navigate = useNavigate();
     const [token, setToken] = useState(null);
-    const [userName, setUserName] = useState(null);
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
         (async () => {
@@ -73,7 +72,7 @@ export default function AuthProvider() {
                     navigate("/");
                     return false;
                 }
-                setUserName(decodedToken.name);
+                if (decodedToken) { setUserData(decodedToken); }
                 return true;
             } catch (error) {
                 console.error("Error decoding token:", error);
@@ -86,7 +85,8 @@ export default function AuthProvider() {
     return {
         setToken: saveToken,
         isValidToken,
-        userName,
+        baseWSURL,
+        userData,
         token,
         http,
     };
