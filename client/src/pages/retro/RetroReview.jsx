@@ -8,14 +8,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 
 
-export default function RetroColumn({ title, data, addComment }) {
+export default function RetroColumn({ title, data, addReview, updateReview }) {
 
     const [isAddNew, setIsAddNew] = useState(false);
     const [editedValue, setEditedValue] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
 
-    const handleEdit = (index, currentValue) => {
-        setEditedValue(currentValue);
+    const handleEdit = (index, item) => {
+        setEditedValue(item.comment);
         setEditingIndex(index);
         setIsAddNew(false);
     };
@@ -26,16 +26,19 @@ export default function RetroColumn({ title, data, addComment }) {
         setIsAddNew(false);
     };
 
-    const handleSave = (index) => {
-        if (index === null) {
-            addComment(editedValue);
-        } else {
-            data[index] = editedValue;
-        }
+    const handleSave = () => {
+        addReview(editedValue);
         setEditingIndex(null);
         setEditedValue('');
         setIsAddNew(false);
     };
+
+    const handleUpdate = (item, index) => {
+        updateReview(editedValue, index);
+        setEditingIndex(null);
+        setEditedValue('');
+        setIsAddNew(false);
+    }
 
     return (
         <Grid size={{ xs: 12, md: 3 }}>
@@ -61,7 +64,7 @@ export default function RetroColumn({ title, data, addComment }) {
                                     <IconButton aria-label="cancel" onClick={handleCancel}>
                                         <CloseIcon fontSize='small' color='error' />
                                     </IconButton>
-                                    <IconButton aria-label="save" onClick={() => handleSave(index)}>
+                                    <IconButton aria-label="save" onClick={() => handleUpdate(item, index)}>
                                         <CheckIcon fontSize='small' color='success' />
                                     </IconButton>
                                 </div>
@@ -69,10 +72,10 @@ export default function RetroColumn({ title, data, addComment }) {
                         ) : (
                             <Card className='retro-comment-card-item' onClick={() => handleEdit(index, item)}>
                                 <Typography variant='body2'>
-                                    {item.comment}
+                                    {item?.comment}
                                 </Typography>
                                 <div className='author'>
-                                    <Typography variant='caption' color='secondary'>~{item.createdBy}</Typography>
+                                    <Typography variant='caption' color='secondary'>~{item?.email}</Typography>
                                 </div>
                             </Card>
                         )}
@@ -95,7 +98,7 @@ export default function RetroColumn({ title, data, addComment }) {
                                 <IconButton aria-label="cancel" onClick={handleCancel}>
                                     <CloseIcon fontSize='small' color='error' />
                                 </IconButton>
-                                <IconButton aria-label="save" onClick={() => handleSave(null)}>
+                                <IconButton aria-label="save" onClick={() => handleSave()}>
                                     <CheckIcon fontSize='small' color='success' />
                                 </IconButton>
                             </div>
@@ -119,5 +122,6 @@ export default function RetroColumn({ title, data, addComment }) {
 RetroColumn.propTypes = {
     title: PropTypes.string.isRequired,
     data: PropTypes.array.isRequired,
-    addComment: PropTypes.func.isRequired,
+    addReview: PropTypes.func.isRequired,
+    updateReview: PropTypes.func.isRequired
 };

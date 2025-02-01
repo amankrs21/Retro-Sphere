@@ -15,10 +15,11 @@ const CartBadge = styled(Badge)`
   }
 `;
 
-export default function RetroMood({ emojis, updateEmoji }) {
+export default function RetroMood({ moods, updateEmoji }) {
 
     const { userData } = AuthProvider();
     const [curEmoji, setCurEmoji] = useState(null);
+    const emojis = ['😡', '😠', '😐', '🙂', '🤩'];
 
     const onMoodUpdate = (emoji) => {
         setCurEmoji(emoji);
@@ -26,31 +27,31 @@ export default function RetroMood({ emojis, updateEmoji }) {
     };
 
     useEffect(() => {
-        if (emojis) {
-            const userEmoji = Object.keys(emojis).find((emoji) => emojis[emoji].users.includes(userData.email));
+        if (moods) {
+            const userEmoji = moods.find((data) => data?.users?.includes(userData?.email))?.emoji;
             setCurEmoji(userEmoji);
         }
-    }, [emojis]);
+    }, [moods, userData?.email]);
 
-    if (!emojis || typeof emojis !== 'object') {
+    if (!moods) {
         return <div>No emojis available.</div>;
     }
 
     return (
         <Grid container spacing={2}>
-            {Object.keys(emojis).map((emoji) => (
-                <Grid key={emoji}>
+            {moods.map((data, index) => (
+                <Grid key={index}>
                     <Button
-                        variant={emoji === curEmoji ? 'contained' : 'outlined'}
-                        onClick={() => { onMoodUpdate(emoji) }}
+                        variant={data?.emoji === curEmoji ? 'contained' : 'outlined'}
+                        onClick={() => { onMoodUpdate(data?.emoji) }}
                         style={{ fontSize: '2rem' }}
                     >
                         <CartBadge
                             color="secondary"
                             overlap="circular"
-                            badgeContent={`${emojis[emoji].users.length ?? 0}`}
+                            badgeContent={`${data?.users?.length ?? 0}`}
                         />
-                        {emoji}
+                        {data?.emoji}
                     </Button>
                 </Grid>
             ))}
@@ -59,6 +60,6 @@ export default function RetroMood({ emojis, updateEmoji }) {
 };
 
 RetroMood.propTypes = {
-    emojis: PropTypes.object,
+    moods: PropTypes.array.isRequired,
     updateEmoji: PropTypes.func.isRequired,
 };

@@ -11,9 +11,9 @@ import AuthProvider from '../../middleware/AuthProvider';
 export default function Retro() {
 
     const { token } = AuthProvider();
-    const { retroData, updateEmoji, addComment } = useWebSocket();
+    const { retroData, updateEmoji, addReview, updateReview } = useWebSocket();
 
-    if (!token) {
+    if (!token || !retroData) {
         return <div>Please log in to access the retro board.</div>;
     }
 
@@ -29,7 +29,7 @@ export default function Retro() {
                     </Typography>
                 </div>
                 <div>
-                    <RetroMood emojis={retroData?.emojis || null} updateEmoji={updateEmoji} />
+                    <RetroMood moods={retroData?.moods || null} updateEmoji={updateEmoji} />
                 </div>
             </div>
 
@@ -38,24 +38,25 @@ export default function Retro() {
             <Grid container spacing={1} mt={1}>
                 <RetroReview
                     title="Start Doing"
-                    data={retroData?.comments?.startDoing || []}
-                    addComment={(text) => addComment('startDoing', text)}
+                    data={retroData?.reviews?.startDoing || []}
+                    addReview={(text) => addReview('startDoing', text)}
+                    updateReview={(text, index) => updateReview('startDoing', text, index)}
                 />
-                <RetroReview
+                {/* <RetroReview
                     title="Stop Doing"
-                    data={retroData?.comments?.stopDoing || []}
+                    data={retroData?.reviews?.stopDoing || []}
                     addComment={(text) => addComment('stopDoing', text)}
                 />
                 <RetroReview
                     title="Continue Doing"
-                    data={retroData?.comments?.continueDoing || []}
+                    data={retroData?.reviews?.continueDoing || []}
                     addComment={(text) => addComment('continueDoing', text)}
                 />
                 <RetroReview
                     title="Appreciation"
-                    data={retroData?.comments?.appreciation || []}
+                    data={retroData?.reviews?.appreciation || []}
                     addComment={(text) => addComment('appreciation', text)}
-                />
+                /> */}
             </Grid>
         </Container>
     );

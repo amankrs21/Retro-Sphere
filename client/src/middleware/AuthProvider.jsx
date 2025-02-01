@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 
 // Use environment variables for base URL
-const baseURL = "http://192.168.1.39:3000/api";
-const baseWSURL = "ws://192.168.1.39:3001"
+const baseURL = "http://192.168.1.39:8080/api";
+const baseWSURL = "ws://192.168.1.39:8080"
 
 
 // Axios instance with default configurations
@@ -26,7 +26,7 @@ http.interceptors.response.use(
     (error) => {
         if (!error.response && error.message === "Network Error") {
             localStorage.clear();
-            setTimeout(() => { window.location.href = "/503"; }, 2000);
+            // setTimeout(() => { window.location.href = "/503"; }, 2000);
         }
         if (error.response.status === 401) {
             localStorage.clear();
