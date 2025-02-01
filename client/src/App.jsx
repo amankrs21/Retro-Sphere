@@ -1,27 +1,23 @@
-// import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Router from "./Router";
-import { LoadingProvider } from './contexts/LoadingContext';
 import Loading from './components/Loading';
+import ErrorPage from './components/ErrorPage';
+import ErrorBoundary from './middleware/ErrorBoundary';
+import { LoadingProvider } from './contexts/LoadingContext';
 
+
+// App component to render the application
 export default function App() {
 
   return (
-    <LoadingProvider>
-      <Loading />
+    <ErrorBoundary fallback={<ErrorPage />}>
+      <LoadingProvider>
+        <Loading />
+        <Router />
+      </LoadingProvider>
       <ToastContainer theme="colored" draggable={false} hideProgressBar={true} position="bottom-right" />
-      <Router />
-    </LoadingProvider>
+    </ErrorBoundary>
   )
 }
-
-
-{/* <LoadingProvider>
-      <Loading />
-      <ToastContainer theme="colored" draggable={false} hideProgressBar={true} position="bottom-right" />
-      <ErrorBoundary fallback={<ErrorPage />}>
-        <App />
-      </ErrorBoundary>
-    </LoadingProvider> */}
