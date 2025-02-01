@@ -4,6 +4,8 @@ import {
 } from "@mui/material";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
+
+// Page Not Found component
 export default function PageNotFound() {
     return (
         <Container maxWidth="lg" sx={{ height: '100vh', textAlign: 'center' }}>

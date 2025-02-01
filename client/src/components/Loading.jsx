@@ -4,6 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useLoading } from '../hooks/useLoading';
 
 
+// Loading spinner
 export default function Loading() {
     const { loading } = useLoading();
 

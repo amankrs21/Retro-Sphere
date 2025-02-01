@@ -4,6 +4,8 @@ import {
 } from "@mui/material";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
+
+// Server Unavailable component
 export default function ServerUnavl() {
     return (
         <Container maxWidth="lg" sx={{ height: '100vh', textAlign: 'center' }}>
