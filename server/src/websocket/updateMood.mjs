@@ -1,6 +1,6 @@
 import RetroBoardModel from "../models/board.model.mjs";
 
-export async function updateEmoji(retroId, data) {
+export async function updateMood(retroId, data) {
     const { emoji, email } = data;
 
     await RetroBoardModel.updateOne(

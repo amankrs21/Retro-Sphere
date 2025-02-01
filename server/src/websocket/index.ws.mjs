@@ -1,5 +1,5 @@
 import { addReview } from "./addReview.mjs";
-import { updateEmoji } from "./updateEmoji.mjs";
+import { updateMood } from "./updateMood.mjs";
 import { updateReview } from "./updateReview.mjs";
 import { validateUser } from "./validateUser.mjs";
 import { retroIntialReq } from "./retroIntialReq.mjs";
@@ -44,10 +44,10 @@ export function setupSocket(io) {
 
 
         // handle update emoji
-        socket.on("updateEmoji", async (data) => {
-            const response = await updateEmoji(retroId, data);
+        socket.on("updateMood", async (data) => {
+            const response = await updateMood(retroId, data);
             if (response) {
-                io.emit("updateEmoji", { retroId, moods: response });
+                io.emit("updateMood", { retroId, moods: response });
             }
         });
 
