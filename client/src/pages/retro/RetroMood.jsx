@@ -5,9 +5,9 @@ import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Badge, { badgeClasses } from '@mui/material/Badge';
 
-import AuthProvider from '../../middleware/AuthProvider';
+import { useAuth } from '../../hooks/useAuth';
 
-
+// Custom styled component
 const CartBadge = styled(Badge)`
   & .${badgeClasses.badge} {
     top: -21px;
@@ -15,15 +15,16 @@ const CartBadge = styled(Badge)`
   }
 `;
 
-export default function RetroMood({ moods, updateEmoji }) {
 
-    const { userData } = AuthProvider();
+// RetroMood component
+export default function RetroMood({ moods, updateMood }) {
+
+    const { userData } = useAuth();
     const [curEmoji, setCurEmoji] = useState(null);
-    const emojis = ['😡', '😠', '😐', '🙂', '🤩'];
 
     const onMoodUpdate = (emoji) => {
         setCurEmoji(emoji);
-        updateEmoji(emoji);
+        updateMood(emoji);
     };
 
     useEffect(() => {
@@ -61,5 +62,5 @@ export default function RetroMood({ moods, updateEmoji }) {
 
 RetroMood.propTypes = {
     moods: PropTypes.array.isRequired,
-    updateEmoji: PropTypes.func.isRequired,
+    updateMood: PropTypes.func.isRequired,
 };

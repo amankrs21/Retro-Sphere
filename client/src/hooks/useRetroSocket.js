@@ -1,112 +1,82 @@
-// import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
-// import AuthProvider from '../middleware/AuthProvider';
-
-
-// export const useWebSocket = (retroId) => {
-//     const [ws, setWs] = useState(null);
-//     const [retroData, setRetroData] = useState(null);
-//     const { token, userData, baseWSURL } = AuthProvider();
-
-//     useEffect(() => {
-//         if (!token || !baseWSURL) {
-//             console.error('WebSocket connection requires a valid token and BaseUrl.');
-//             return;
-//         }
-
-//         const socket = new WebSocket(`${baseWSURL}?token=${encodeURIComponent(token)}&retroId=093284893294386`);
-//         setWs(socket);
-
-//         socket.onopen = () => console.log('WebSocket connected');
-//         socket.onmessage = (event) => {
-//             const message = JSON.parse(event.data);
-//             if (message.type === 'initialData') {
-//                 setRetroData(message.data);
-//             } else if (message.type === 'update') {
-//                 setRetroData(message.data);
-//             }
-//         };
-//         socket.onclose = () => console.log('WebSocket disconnected');
-//         socket.onerror = (error) => console.error('WebSocket error:', error);
-
-//         return () => socket.close();
-//     }, [token, retroId, baseWSURL]);
-
-//     const updateEmoji = (emoji) => {
-//         ws?.send(JSON.stringify({ type: 'updateEmoji', emoji, email: userData.email }));
-//     };
-
-//     const addComment = (column, comment) => {
-//         ws?.send(JSON.stringify({ type: 'addComment', column, comment, email: userData.email }));
-//     };
-
-//     return { retroData, updateEmoji, addComment };
-// };
+import { useAuth } from "./useAuth";
 
 
-
-
-
-
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-
-export default function useRetroSocket(retroId) {
+// Custom hook to use the WebSocket connection
+export const useRetroSocket = (retroId) => {
     const [socket, setSocket] = useState(null);
-    const [boardData, setBoardData] = useState(null);
-    const { token } = useAuth();
-    const reconnect = useRef(null);
-
-    const connect = useCallback(() => {
-        if (!token || !retroId) return;
-
-        const ws = new WebSocket(
-            `ws://localhost:3001?token=${token}&retroId=${retroId}`
-        );
-
-        ws.onopen = () => {
-            console.log('WebSocket connected');
-            if (reconnect.current) clearTimeout(reconnect.current);
-        };
-
-        ws.onmessage = (event) => {
-            const { type, data } = JSON.parse(event.data);
-            if (type === 'INITIAL_DATA' || type === 'STATE_UPDATE') {
-                setBoardData(data);
-            }
-        };
-
-        ws.onclose = () => {
-            console.log('WebSocket disconnected - attempting reconnect...');
-            reconnect.current = setTimeout(connect, 3000);
-        };
-
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-            ws.close();
-        };
-
-        setSocket(ws);
-    }, [token, retroId]);
+    const [retroData, setRetroData] = useState(null);
+    const { token, userData, baseWSURL, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        connect();
-        return () => {
-            if (socket) socket.close();
-            if (reconnect.current) clearTimeout(reconnect.current);
-        };
-    }, [connect]);
-
-    const sendMessage = useCallback((type, data) => {
-        if (socket?.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ type, data }));
+        if (!token || !baseWSURL || !isAuthenticated || !retroId) {
+            console.error("WebSocket connection requires a valid token.");
+            return;
         }
-    }, [socket]);
+        const newSocket = io(baseWSURL, {
+            query: { token, retroId },
+            transports: ["websocket"],
+        });
+        setSocket(newSocket);
 
-    return {
-        boardData,
-        updateEmoji: (emoji) => sendMessage('EMOJI_UPDATE', { emoji }),
-        addComment: (column, text) => sendMessage('COMMENT_ADD', { column, text })
+        newSocket.on("connect", () => console.log("WebSocket connected"));
+        newSocket.on("disconnect", () => console.log("WebSocket disconnected"));
+
+        // handle initial data
+        newSocket.on("initialData", (data) => {
+            console.log("GOT INITIAL DATA:", data);
+            setRetroData(data);
+        });
+
+        // handle update mood
+        newSocket.on("updateMood", ({ retroId: updatedRetroId, moods }) => {
+            if (updatedRetroId === retroId) {
+                console.log("GOT UPDATED EMOJI DATA");
+                setRetroData((prev) => ({ ...prev, moods }));
+            }
+        });
+
+        // handle add review
+        newSocket.on("addReview", ({ retroId: updatedRetroId, reviews }) => {
+            if (updatedRetroId === retroId) {
+                console.log("GOT ADD REVIEW DATA");
+                setRetroData((prev) => ({ ...prev, reviews }));
+            }
+        });
+
+        // handle update review
+        newSocket.on("updateReview", ({ retroId: updatedRetroId, reviews }) => {
+            if (updatedRetroId === retroId) {
+                console.log("GOT UPDATE REVIEW DATA");
+                setRetroData((prev) => ({ ...prev, reviews }));
+            }
+        });
+
+        return () => newSocket.disconnect();
+    }, [token, baseWSURL, retroId, isAuthenticated]);
+
+
+    // update mood
+    const updateMood = (emoji) => {
+        console.log("UPDATING EMOJI", { emoji, email: userData?.email });
+        socket?.emit("updateMood", { emoji, email: userData?.email });
     };
-}
+
+    // add review
+    const addReview = (column, comment) => {
+        console.log("ADDING REVIEW", { column, comment, email: userData?.email });
+        socket?.emit("addReview", { column, comment, email: userData?.email });
+    };
+
+    // update review
+    const updateReview = (column, comment, index) => {
+        console.log("UPDATING REVIEW", { column, comment, index, email: userData?.email });
+        socket?.emit("updateReview", { column, comment, index, email: userData?.email });
+    };
+
+
+    // return the data and functions
+    return { retroData, updateMood, addReview, updateReview };
+};

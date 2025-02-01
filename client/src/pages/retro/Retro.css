@@ -13,12 +13,12 @@
 .retro-comment-card {
     padding: 0 !important;
     position: relative !important;
-    background: #f5f5f5 !important;
+    background: #eaf1fc !important;
 }
 
 .retro-comment-card-header {
     color: white;
-    padding: 5px !important;
+    padding: 3px !important;
     text-align: center !important;
     margin-bottom: 5px !important;
     background: #1565c0 !important;

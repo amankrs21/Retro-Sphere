@@ -44,7 +44,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
         <Grid size={{ xs: 12, md: 3 }}>
             <Card className='retro-comment-card'>
                 <div className='retro-comment-card-header'>
-                    <Typography variant='h6'>{title}</Typography>
+                    <Typography variant='subtitle1'>{title}</Typography>
                 </div>
 
                 {data.map((item, index) => (
@@ -104,7 +104,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
                             </div>
                         </div>
                     ) : (
-                        <Button fullWidth variant="outlined"
+                        <Button fullWidth variant="outlined" size='small'
                             onClick={() => {
                                 setIsAddNew(true);
                                 setEditedValue('');
