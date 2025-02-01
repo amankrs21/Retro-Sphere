@@ -15,27 +15,24 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import './Login.css';
+import { useAuth } from '../../hooks/useAuth';
 import { useLoading } from '../../hooks/useLoading';
-import AuthProvider from '../../middleware/AuthProvider';
 
 
+// Login page component
 export default function Login() {
 
     const navigate = useNavigate();
     const { setLoading } = useLoading();
     const [show, setShow] = useState(false);
-    // const [openFP, setOpenFP] = useState(false);
-    const { http, setToken, isValidToken } = AuthProvider();
+    const { http, login, isAuthenticated } = useAuth();
     const [formData, setFormData] = useState({ email: '', password: '' });
 
-
     useEffect(() => {
-        (async () => {
-            const token = localStorage.getItem('token') || null;
-            if (token && await isValidToken(token)) { navigate('/home'); }
-        })();
-    }, []);
-
+        if (isAuthenticated) {
+            navigate('/home');
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleChange = (e) => {
         setFormData({
@@ -50,7 +47,7 @@ export default function Login() {
             setLoading(true);
             const response = await http.post('/auth/login', formData);
             if (response.data.token) {
-                setToken(response.data.token);
+                login(response.data.token);
                 toast.success(response.data.message);
                 navigate('/home');
             }
@@ -65,9 +62,11 @@ export default function Login() {
             try {
                 setLoading(true);
                 const response = await http.post('/auth/google-login', { token: authResult.code });
-                localStorage.setItem('token', response.data.token);
-                toast.success(response.data.message);
-                navigate('/home');
+                if (response.data.token) {
+                    login(response.data.token);
+                    toast.success(response.data.message);
+                    navigate('/home');
+                }
             } catch (error) {
                 console.error("Google login failed:", error);
                 toast.error('Error during Google login');

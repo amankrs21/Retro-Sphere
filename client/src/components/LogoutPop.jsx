@@ -5,14 +5,21 @@ import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
+import { useAuth } from '../hooks/useAuth';
+
+
+// Logout confirmation dialog
 export default function LogoutPop({ openLogout, setOpenLogout }) {
+    const { logout } = useAuth();
     const navigate = useNavigate();
+
     const handleLogout = () => {
-        toast.success('Logout successful');
-        setOpenLogout(false);
-        localStorage.clear();
+        logout();
         navigate('/login');
+        setOpenLogout(false);
+        toast.success('Logout successful');
     }
+
     return (
         <Dialog
             fullWidth

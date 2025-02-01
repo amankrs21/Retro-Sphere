@@ -1,35 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-
-import AuthUser from './AuthProvider';
 import Header from '../layout/Header';
-import { useLoading } from '../hooks/useLoading';
+import { useAuth } from '../hooks/useAuth';
 // import Footer from '../layout/Footer';
 // import { FloatingEmojiProvider } from '../contexts/FloatingEmojiContext';
 
+
+// PrivateRoutes component to protect routes
 export default function PrivateRoutes() {
 
     const navigate = useNavigate();
-    const { isValidToken } = AuthUser();
-    const { setLoading } = useLoading();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const checkAuth = async () => {
-            setLoading(true);
-            const token = localStorage.getItem("token");
-            if (!token || !(await isValidToken(token))) {
-                localStorage.clear();
-                navigate('/login');
-            } else {
-                setIsAuthenticated(true);
-            }
-            setLoading(false);
-        };
-
-        checkAuth();
-    }, [navigate, setLoading]);
+        if (!isAuthenticated) {
+            navigate('/login');
+        }
+    }, [isAuthenticated, navigate]);
 
     if (!isAuthenticated) {
         return null;

@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
+
 // Create context with proper typing
 const AuthContext = createContext({
     token: null,
@@ -13,9 +14,12 @@ const AuthContext = createContext({
     isAuthenticated: false,
     login: () => { },
     logout: () => { },
-    wsURL: ''
+    baseURL: '',
+    baseWSURL: ''
 });
+export { AuthContext };
 
+// Export the context
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [token, setToken] = useState(() => localStorage.getItem('token'));
@@ -23,14 +27,14 @@ export const AuthProvider = ({ children }) => {
 
     const http = useMemo(() => {
         const instance = axios.create({
-            baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+            baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
             withCredentials: true,
         });
 
         instance.interceptors.response.use(
             response => response,
             error => {
-                if (!error.response) {
+                if (!error.response && error.message === "Network Error") {
                     // Network error
                     localStorage.clear();
                     navigate("/503");
@@ -86,7 +90,8 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: !!token,
         login,
         logout,
-        wsURL: import.meta.env.VITE_WS_URL || 'ws://localhost:3001'
+        baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
+        baseWSURL: import.meta.env.VITE_WS_URL ?? 'ws://localhost:3001'
     }), [token, userData, http]);
 
     return (

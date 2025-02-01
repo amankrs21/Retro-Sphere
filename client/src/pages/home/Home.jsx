@@ -6,12 +6,19 @@ import {
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 import './Home.css';
-import AuthProvider from '../../middleware/AuthProvider';
+import { useAuth } from '../../hooks/useAuth';
 
+
+// Home page component
 export default function Home() {
 
     document.title = "Retro | Home";
-    const { userData } = AuthProvider();
+    const { userData, isAuthenticated } = useAuth();
+
+    if (!isAuthenticated) {
+        window.location.href = '/login';
+        return null;
+    }
 
     return (
         <Container maxWidth="xl">
