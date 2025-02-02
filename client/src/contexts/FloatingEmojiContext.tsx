@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FloatingEmojiContextType {
+    emojiFeedback: Record<string, number>;
     triggerEmoji: (emoji: string) => void;
 }
 
@@ -17,10 +18,30 @@ export const useFloatingEmoji = () => {
 
 export const FloatingEmojiProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [floatingEmojis, setFloatingEmojis] = useState<{ id: number; emoji: string }[]>([]);
+    const [emojiFeedback, setEmojiFeedback] = useState<Record<string, number>>({
+        '😀': 0,
+        '🙂': 0,
+        '😐': 0,
+        '😞': 0,
+        '😡': 0,
+    });
+
+    useEffect(() => {
+        const ws = new WebSocket('ws://localhost:3000'); // Replace with your WebSocket server URL
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.emojiFeedback) {
+                setEmojiFeedback(data.emojiFeedback); // Update emoji feedback counts
+            }
+        };
+
+        return () => ws.close();
+    }, []);
 
     const triggerEmoji = (emoji: string) => {
         const newEmojis = Array.from({ length: 10 }, (_, index) => ({
-            id: Date.now() + index, // Unique ID for each emoji
+            id: Date.now() + index,
             emoji,
         }));
 
@@ -33,10 +54,9 @@ export const FloatingEmojiProvider: React.FC<{ children: ReactNode }> = ({ child
     };
 
     return (
-        <FloatingEmojiContext.Provider value={{ triggerEmoji }}>
+        <FloatingEmojiContext.Provider value={{ emojiFeedback, triggerEmoji }}>
             {children}
 
-            {/* Fixed container for floating emojis */}
             <div
                 style={{
                     position: 'fixed',
@@ -44,9 +64,9 @@ export const FloatingEmojiProvider: React.FC<{ children: ReactNode }> = ({ child
                     left: 0,
                     width: '100vw',
                     height: '100vh',
-                    pointerEvents: 'none', // Prevent interaction with the animation layer
-                    overflow: 'hidden', // Ensure emojis don't extend outside the screen
-                    zIndex: 9999, // Ensure this layer is above all other elements
+                    pointerEvents: 'none',
+                    overflow: 'hidden',
+                    zIndex: 9999,
                 }}
             >
                 <AnimatePresence>
@@ -59,12 +79,12 @@ export const FloatingEmojiProvider: React.FC<{ children: ReactNode }> = ({ child
                             transition={{
                                 duration: 3,
                                 ease: 'easeInOut',
-                                delay: Math.random() * 0.5, // Random delay for staggered effect
+                                delay: Math.random() * 0.5,
                             }}
                             style={{
                                 position: 'absolute',
                                 bottom: 0,
-                                left: `${Math.random() * 80 + 10}%`, // Random horizontal position
+                                left: `${Math.random() * 80 + 10}%`,
                                 fontSize: '3rem',
                                 pointerEvents: 'none',
                             }}
