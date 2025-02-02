@@ -32,7 +32,7 @@ const httpServer = createServer(app);
 // Start WebSocket server
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: process.env.CORS_ORIGIN.split(","),
         methods: ["GET", "POST"]
     },
 });

@@ -1,10 +1,12 @@
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 
 import router from "./routes/index.route.mjs";
 import errorHandler from "./middleware/error.handler.mjs";
 
 
+dotenv.config();
 const app = express();
 
 // Disable x-powered-by header to prevent version disclosure
@@ -24,10 +26,7 @@ app.use((req, res, next) => {
 
 
 // Configure CORS
-const allowedOrigins = [
-    "http://localhost:5173",
-    "http://192.168.1.39:5173"
-];
+const allowedOrigins = process.env.CORS_ORIGIN.split(",");
 const corsOptions = {
     credentials: true,
     origin: allowedOrigins,
@@ -39,6 +38,7 @@ app.use(cors(corsOptions));
 
 
 // Set up routes
+app.use("/", express.static("public"));
 app.use("/api", router);
 
 
