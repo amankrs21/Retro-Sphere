@@ -1,4 +1,5 @@
 import Grid from '@mui/material/Grid2';
+import Typewriter from "typewriter-effect";
 import { Typography, Container, Divider, Card } from '@mui/material';
 
 import './Retro.css';
@@ -11,6 +12,8 @@ import { useRetroSocket } from '../../hooks/useRetroSocket';
 // RetroBoard page component
 export default function RetroBoard() {
 
+    document.title = "Retro-Board | PIM Essentials";
+
     const retroId = "0987654321";
     const { isAuthenticated } = useAuth();
     const { retroData, updateMood, addReview, updateReview } = useRetroSocket(retroId);
@@ -21,19 +24,49 @@ export default function RetroBoard() {
 
     return (
         <Container maxWidth="xl">
-            <div className="retro-header">
-                <div className="retro-header-title">
+            <Grid container className="retro-header" spacing={0}>
+                <Grid
+                    size={{ xs: 12, md: 5 }}
+                    className="retro-header-title"
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: { xs: "center", md: "flex-start" },
+                        textAlign: { xs: "center", md: "left" },
+                    }}
+                >
                     <Typography variant="h4" gutterBottom>
-                        Retro-Board
+                        Retro-Board | PIM Essentials
                     </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                        How do you feel about the sprint?
+                    <Typography variant="subtitle1" color='warning' gutterBottom>
+                        <Typewriter
+                            options={{
+                                strings: [
+                                    'Welcome to Retro-Board 🤖',
+                                    'How do you feel about the sprint?',
+                                    'Share your thoughts, ideas, and feedback',
+                                ],
+                                autoStart: true,
+                                loop: true,
+                                deleteSpeed: 50,
+                            }}
+                        />
+
                     </Typography>
-                </div>
-                <div>
+                </Grid>
+
+                <Grid
+                    size={{ xs: 12, md: 7 }}
+                    sx={{
+                        display: "flex",
+                        alignItems: { xs: "center", md: "flex-end" },
+                        justifyContent: { xs: "center", md: "flex-end" },
+                    }}
+                >
                     <RetroMood moods={retroData?.moods ?? []} updateMood={updateMood} />
-                </div>
-            </div>
+                </Grid>
+            </Grid>
+
 
             <Divider />
 
