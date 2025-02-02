@@ -23,7 +23,8 @@ export default function Home() {
     return (
         <Container maxWidth="xl">
             <Typography variant="h4" align="center" gutterBottom>
-                👋 Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
+                <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
+                Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
                 Welcome to <b className='custom-home-text'>Retro-Sphere!</b> 🚀
             </Typography>
 
