@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -77,6 +77,7 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write
+      contents: read
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -91,9 +92,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6FAF6266223049FAA15F0D11F13E3882 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2230CE1C7D0A43B5B038A77D60B401D7 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F8B74683D782480CA27FD2783648FB33 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_1577C458E0304C228AACB6331C8E450E }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6340B4CE5ABE4B1D87A409A9D12822BD }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C20F351765074CD49E8F7A9634CC87EB }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
