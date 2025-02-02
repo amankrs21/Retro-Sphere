@@ -39,7 +39,7 @@ export default function RetroMood({ moods, updateMood }) {
     }
 
     return (
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
             {moods.map((data, index) => (
                 <Grid key={index}>
                     <Button
