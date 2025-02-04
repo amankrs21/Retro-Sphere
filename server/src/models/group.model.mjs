@@ -11,12 +11,8 @@ const GroupModel = new mongoose.Schema({
         enum: ['active', 'inactive'],
         default: 'active',
     },
-    members: [{
-        type: mongo.Schema.Types.ObjectId,
-        ref: 'UserModel',
-    }],
     createdBy: {
-        type: mongo.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'UserModel',
         required: true
     },
