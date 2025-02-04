@@ -1,6 +1,7 @@
 import express from "express";
 
 import authRoute from "./auth.route.mjs";
+import groupRoute from "./group.route.mjs";
 
 
 const router = express.Router();
@@ -14,6 +15,10 @@ router.get("/health", (req, res) => {
 
 // auth route
 router.use("/auth", authRoute);
+
+
+// group route
+router.use("/group", groupRoute);
 
 
 // exporting the router
