@@ -4,24 +4,58 @@ import {
     TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
 } from "@mui/material";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { toast } from 'react-toastify';
 
 import './Home.css';
 import { useAuth } from '../../hooks/useAuth';
+import { useState } from 'react';
+import GroupAdd from '../group/GroupAdd';
 
 
 // Home page component
 export default function Home() {
 
     document.title = "Retro | Home";
-    const { userData, isAuthenticated } = useAuth();
+    const [openGAdd, setOpenGAdd] = useState(false);
+    const { userData, isAuthenticated, http } = useAuth();
 
     if (!isAuthenticated) {
         window.location.href = '/login';
         return null;
     }
 
+    const handleGroupAdd = async (data) => {
+        // Remove unnecessary spaces, newlines, and split by comma
+        const members = data.members
+            .split(',')
+            .map(email => email.trim().replace(/^"|"$/g, ''))
+            .filter(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+
+        if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {
+            toast.info("Invalid email(s) entered. Please check and try again.");
+            return;
+        }
+
+        try {
+            const response = await http.post('/group/add', {
+                name: data.name,
+                members
+            });
+            setOpenGAdd(false);
+            toast.success("Group added successfully!");
+            if (response.data?.memberNotFound)
+                toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
+            console.error(error);
+        }
+
+    };
+
+
     return (
         <Container maxWidth="xl">
+            {openGAdd && <GroupAdd openAdd={openGAdd} setOpenAdd={setOpenGAdd} handleAdd={handleGroupAdd} />}
             <Typography variant="h4" align="center" gutterBottom>
                 <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
                 Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
@@ -52,7 +86,7 @@ export default function Home() {
                             <Typography variant="h6" align="center" gutterBottom>
                                 Your Groups 🌟
                             </Typography>
-                            <Button variant="contained" color="success">
+                            <Button variant="contained" color="success" onClick={() => setOpenGAdd(!openGAdd)}>
                                 + Create New
                             </Button>
                         </div>
