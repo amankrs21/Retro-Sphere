@@ -1,4 +1,6 @@
+import UserModel from "../models/user.model.mjs";
 import GroupModel from "../models/group.model.mjs";
+import MemberModel from "../models/member.model.mjs";
 
 
 // create a new group
@@ -10,25 +12,28 @@ const createGroup = async (req, res, next) => {
         const groupExist = await GroupModel.findOne({ name });
         if (groupExist) {
             return res.status(400).json({
-                message: "Group name already exists",
+                message: "Group name not available, please try another name!",
             });
         }
         const group = new GroupModel({
             name,
             status: "active",
-            createdBy: req.userId,
+            createdBy: req.currentUser,
         });
         await group.save();
 
         // find members id from database
         const memberNotFound = [];
-        const membersId = [req.userId];
+        const membersId = [req.currentUser];
         for (let i = 0; i < members.length; i++) {
             const member = members[i];
             const memberExist = await UserModel.findOne({ email: member });
             if (!memberExist) {
                 memberNotFound.push(member);
             } else {
+                if (membersId.includes(memberExist._id)) {
+                    continue;
+                }
                 membersId.push(memberExist._id);
             }
         }
@@ -57,7 +62,7 @@ const createGroup = async (req, res, next) => {
 // fetch groupd and their members
 const fetchGroups = async (req, res, next) => {
     try {
-        const groups = await GroupModel.find({ createdBy: req.userId }).populate(
+        const groups = await GroupModel.find({ createdBy: req.currentUser }).populate(
             "members"
         );
         return res.status(200).json({
