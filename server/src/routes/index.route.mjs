@@ -2,6 +2,7 @@ import express from "express";
 
 import authRoute from "./auth.route.mjs";
 import groupRoute from "./group.route.mjs";
+import validSession from "../middleware/session.middleware.mjs";
 
 
 const router = express.Router();
@@ -18,7 +19,7 @@ router.use("/auth", authRoute);
 
 
 // group route
-router.use("/group", groupRoute);
+router.use("/group", validSession, groupRoute);
 
 
 // exporting the router
