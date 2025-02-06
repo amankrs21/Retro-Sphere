@@ -8,13 +8,15 @@ const createGroup = async (req, res, next) => {
     try {
         const { name, members } = req.body;
 
-        // check if group name already exists
+        // Check if group name already exists
         const groupExist = await GroupModel.findOne({ name });
         if (groupExist) {
             return res.status(400).json({
                 message: "Group name not available, please try another name!",
             });
         }
+
+        // Create the group
         const group = new GroupModel({
             name,
             status: "active",
@@ -22,30 +24,30 @@ const createGroup = async (req, res, next) => {
         });
         await group.save();
 
-        // find members id from database
-        const memberNotFound = [];
-        const membersId = [req.currentUser];
-        for (let i = 0; i < members.length; i++) {
-            const member = members[i];
-            const memberExist = await UserModel.findOne({ email: member });
-            if (!memberExist) {
-                memberNotFound.push(member);
-            } else {
-                if (membersId.includes(memberExist._id)) {
-                    continue;
-                }
-                membersId.push(memberExist._id);
-            }
+        // Fetch all members in a single query
+        const existingUsers = await UserModel.find({ email: { $in: members } });
+
+        const membersIdSet = new Set(existingUsers.map((user) => user._id.toString()));
+        const memberNotFound = members.filter(
+            (email) => !existingUsers.some((user) => user.email === email)
+        );
+
+        // Ensure current user is included
+        if (![...membersIdSet].some((id) => id.toString() === req.currentUser.toString())) {
+            membersIdSet.add(req.currentUser.toString());
         }
 
-        // add members to group
-        await MemberModel.insertMany(
-            membersId.map((memberId) => ({
-                user: memberId,
-                status: "active",
+        // Convert Set back to Array
+        const membersId = [...membersIdSet];
+
+        // Add members to the group
+        for (const member of membersId) {
+            const memberModel = new MemberModel({
+                user: member,
                 group: group._id,
-            }))
-        );
+            });
+            await memberModel.save();
+        }
 
         return res.status(201).json({
             message: "Group created successfully",
@@ -59,19 +61,37 @@ const createGroup = async (req, res, next) => {
 
 
 
-// fetch groupd and their members
-const fetchGroups = async (req, res, next) => {
+// fetch my groups
+const fetchMyGroups = async (req, res, next) => {
     try {
-        const groups = await GroupModel.find({ createdBy: req.currentUser }).populate(
-            "members"
-        );
+        const groups = await MemberModel.find({ user: req.currentUser })
+            .populate("group")
+            .lean(); // Convert to plain JS objects
+
+        // // Add isOwner property based on createdBy
+        // groups.forEach((member) => {
+        //     member.isOwner = member.group.createdBy.toString() === req.currentUser.toString();
+        // });
+
+        // fetch group owner email
+        for (const group of groups) {
+            const owner = await UserModel.findById(group.group.createdBy).select("email").lean();
+            group.group.ownerEmail = owner.email;
+        }
+
+        // I only want to return group details
+        const groupDetails = groups.map((member) => member.group);
+
         return res.status(200).json({
-            groups,
+            groups: groupDetails,
         });
+
     } catch (error) {
         next(error);
     }
 };
 
+
+
 // exporting functions
-export { createGroup, fetchGroups };
+export { createGroup, fetchMyGroups };
