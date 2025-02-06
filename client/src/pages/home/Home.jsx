@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Grid from '@mui/material/Grid2';
 import {
     Button, Card, Container, Divider, Typography, Paper, Table,
@@ -8,7 +9,7 @@ import { toast } from 'react-toastify';
 
 import './Home.css';
 import { useAuth } from '../../hooks/useAuth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GroupAdd from '../group/GroupAdd';
 
 
@@ -17,12 +18,34 @@ export default function Home() {
 
     document.title = "Retro | Home";
     const [openGAdd, setOpenGAdd] = useState(false);
+    const [groupsData, setGroupsData] = useState([]);
     const { userData, isAuthenticated, http } = useAuth();
 
-    if (!isAuthenticated) {
-        window.location.href = '/login';
-        return null;
-    }
+    useEffect(() => {
+        if (!isAuthenticated || !userData || !http.defaults.headers.common.Authorization) {
+            return;
+        }
+
+        const localGroups = JSON.parse(localStorage.getItem('group')) ?? [];
+        if (localGroups.length > 0) {
+            console.log(localGroups);
+            setGroupsData(localGroups);
+            return;
+        }
+
+        handleFetchGroups();
+    }, [isAuthenticated, userData, http]);
+
+
+    const handleFetchGroups = async () => {
+        try {
+            const response = await http.get('/group/fetch');
+            setGroupsData(response?.data?.groups);
+            localStorage.setItem('group', JSON.stringify(response?.data?.groups));
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const handleGroupAdd = async (data) => {
         // Remove unnecessary spaces, newlines, and split by comma
@@ -97,26 +120,22 @@ export default function Home() {
                                     <TableRow sx={{ backgroundColor: '#4caf50', color: '#fff' }}>
                                         <TableCell sx={{ width: '5%' }}>#</TableCell>
                                         <TableCell sx={{ width: '30%' }}>Group Name</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Owner</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Status</TableCell>
+                                        <TableCell sx={{ width: '35%' }}>Owner</TableCell>
+                                        <TableCell sx={{ width: '10%' }}>Status</TableCell>
                                         <TableCell sx={{ width: '20%' }}>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {[...Array(3)].map((_, index) => (
+                                    {groupsData.length > 0 && groupsData.map((group, index) => (
                                         <TableRow className="table-row" key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell className="table-cell-group-name">
-                                                Group {index + 1}
+                                            <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                                                {group?.name}
                                             </TableCell>
-                                            <TableCell>Owner {index + 1}</TableCell>
-                                            <TableCell>{index == 1 ? 'Inactive' : 'Active'}</TableCell>
+                                            <TableCell>{group?.ownerEmail}</TableCell>
+                                            <TableCell>{group?.status}</TableCell>
                                             <TableCell>
-                                                <Tooltip title="Delete Group">
-                                                    <Button variant="outlined" color="error" size="small">
-                                                        DELETE
-                                                    </Button>
-                                                </Tooltip>
+                                                {new Date(group?.createdAt).toLocaleString()}
                                             </TableCell>
                                         </TableRow>
                                     ))}
