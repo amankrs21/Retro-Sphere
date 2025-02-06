@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
                 } else if (error.response.status === 401) {
                     // Unauthorized
                     localStorage.clear();
-                    navigate("/login");
+                    window.location.href = '/login';
                 }
                 return Promise.reject(error);
             }
@@ -58,8 +58,8 @@ export const AuthProvider = ({ children }) => {
                 if (decoded.exp * 1000 < Date.now()) {
                     logout();
                 } else {
-                    http.defaults.headers.common.Authorization = `Bearer ${token}`;
                     setUserData(decoded);
+                    http.defaults.headers.common.Authorization = `Bearer ${token}`;
                 }
             } catch (error) {
                 console.error('Invalid token:', error);
