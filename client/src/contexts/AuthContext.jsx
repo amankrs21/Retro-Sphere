@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
+        localStorage.clear();
         setToken(null);
         setUserData(null);
         delete http.defaults.headers.common.Authorization;

@@ -5,23 +5,26 @@ import {
     TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
 } from "@mui/material";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import './Home.css';
 import { useAuth } from '../../hooks/useAuth';
-import { useEffect, useState } from 'react';
-import GroupAdd from '../group/GroupAdd';
-import GroupView from '../group/GroupView';
+import { useLoading } from '../../hooks/useLoading';
+import GroupAdd from '../../components/group/GroupAdd';
+import GroupView from '../../components/group/GroupView';
 
 
 // Home page component
 export default function Home() {
 
     document.title = "Retro | Home";
+    const { setLoading } = useLoading();
     const [openGAdd, setOpenGAdd] = useState(false);
     const [openGView, setOpenGView] = useState(null);
     const [groupsData, setGroupsData] = useState([]);
     const { userData, isAuthenticated, http } = useAuth();
+
 
     useEffect(() => {
         if (!isAuthenticated || !userData || !http.defaults.headers.common.Authorization) {
@@ -35,25 +38,29 @@ export default function Home() {
         }
 
         handleFetchGroups();
-    }, [isAuthenticated, userData, http]);
+    }, []);
 
 
     const handleFetchGroups = async () => {
         try {
+            setLoading(true);
             const response = await http.get('/group/fetch');
             setGroupsData(response?.data?.groups);
             localStorage.setItem('group', JSON.stringify(response?.data?.groups));
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleGroupAdd = async (data) => {
-        // Remove unnecessary spaces, newlines, and split by comma
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
         const members = data.members
             .split(',')
             .map(email => email.trim().replace(/^"|"$/g, ''))
-            .filter(email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+            .filter(email => emailRegex.test(email));
 
         if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {
             toast.info("Invalid email(s) entered. Please check and try again.");
@@ -61,17 +68,19 @@ export default function Home() {
         }
 
         try {
+            setLoading(true);
             const response = await http.post('/group/add', { name: data.name, members });
             setOpenGAdd(false);
-            localStorage.removeItem('group');
+            handleFetchGroups();
             toast.success("Group added successfully!");
-            if (response.data?.memberNotFound)
+            if (response.data?.memberNotFound?.length > 0)
                 toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
         } catch (error) {
             toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
             console.error(error);
+        } finally {
+            setLoading(false);
         }
-
     };
 
 
