@@ -11,10 +11,9 @@ const MemberModel = new mongoose.Schema({
         ref: "GroupModel",
         required: true,
     },
-    status: {
-        type: String,
-        enum: ["active", "inactive"],
-        default: "active",
+    createdAt: {
+        type: Date,
+        default: Date.now,
     },
 });
 

@@ -92,6 +92,28 @@ const fetchMyGroups = async (req, res, next) => {
 };
 
 
+// fetch members of a group
+const fetchGroupMembers = async (req, res, next) => {
+    try {
+        const members = await MemberModel.find({ group: req.params.groupId })
+            .populate("user")
+            .lean();
+
+        members.forEach((member) => {
+            member.email = member.user.email;
+            member.name = member.user.name;
+            delete member.user;
+        });
+
+        return res.status(200).json({
+            members,
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 // exporting functions
-export { createGroup, fetchMyGroups };
+export { createGroup, fetchMyGroups, fetchGroupMembers };

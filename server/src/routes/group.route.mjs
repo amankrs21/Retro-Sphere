@@ -1,5 +1,5 @@
 import express from "express";
-import { createGroup, fetchMyGroups } from "../controller/group.controller.mjs";
+import { createGroup, fetchGroupMembers, fetchMyGroups } from "../controller/group.controller.mjs";
 
 
 const groupRoute = express.Router();
@@ -10,6 +10,10 @@ groupRoute.post("/add", createGroup);
 
 // fetch my groups route
 groupRoute.get("/fetch", fetchMyGroups);
+
+
+// fetch group members route
+groupRoute.get("/fetch/:groupId", fetchGroupMembers);
 
 
 // exporting the authRoute
