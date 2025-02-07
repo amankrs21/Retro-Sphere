@@ -4,8 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
 import RetroBoard from './pages/retro/RetroBoard';
-import ServerUnavl from './components/ServerUnavl';
-import PageNotFound from './components/PageNotFound';
+import ServerUnavl from './pages/503/ServerUnavl';
+import PageNotFound from './pages/404/PageNotFound';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoutes from './middleware/PrivateRoutes';
 
