@@ -7,7 +7,8 @@ export default function GroupAdd({ openAdd, setOpenAdd, handleAdd }) {
 
     return (
         <Dialog
-            maxWidth="xs"
+            fullWidth
+            maxWidth='xs'
             open={openAdd}
             onClose={() => setOpenAdd(!openAdd)}
             slotProps={{

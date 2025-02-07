@@ -11,6 +11,7 @@ import './Home.css';
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import GroupAdd from '../group/GroupAdd';
+import GroupView from '../group/GroupView';
 
 
 // Home page component
@@ -18,6 +19,7 @@ export default function Home() {
 
     document.title = "Retro | Home";
     const [openGAdd, setOpenGAdd] = useState(false);
+    const [openGView, setOpenGView] = useState(null);
     const [groupsData, setGroupsData] = useState([]);
     const { userData, isAuthenticated, http } = useAuth();
 
@@ -28,7 +30,6 @@ export default function Home() {
 
         const localGroups = JSON.parse(localStorage.getItem('group')) ?? [];
         if (localGroups.length > 0) {
-            console.log(localGroups);
             setGroupsData(localGroups);
             return;
         }
@@ -60,11 +61,9 @@ export default function Home() {
         }
 
         try {
-            const response = await http.post('/group/add', {
-                name: data.name,
-                members
-            });
+            const response = await http.post('/group/add', { name: data.name, members });
             setOpenGAdd(false);
+            localStorage.removeItem('group');
             toast.success("Group added successfully!");
             if (response.data?.memberNotFound)
                 toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
@@ -79,6 +78,7 @@ export default function Home() {
     return (
         <Container maxWidth="xl">
             {openGAdd && <GroupAdd openAdd={openGAdd} setOpenAdd={setOpenGAdd} handleAdd={handleGroupAdd} />}
+            {openGView !== null && <GroupView openData={openGView} setOpenData={setOpenGView} isOwner={openGView?.createdBy === userData?.id} />}
             <Typography variant="h4" align="center" gutterBottom>
                 <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
                 Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
@@ -119,21 +119,19 @@ export default function Home() {
                                 <TableHead>
                                     <TableRow sx={{ backgroundColor: '#4caf50', color: '#fff' }}>
                                         <TableCell sx={{ width: '5%' }}>#</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Group Name</TableCell>
-                                        <TableCell sx={{ width: '35%' }}>Owner</TableCell>
-                                        <TableCell sx={{ width: '10%' }}>Status</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Action</TableCell>
+                                        <TableCell sx={{ width: '33%' }}>Group Name</TableCell>
+                                        <TableCell sx={{ width: '40%' }}>Owner</TableCell>
+                                        <TableCell sx={{ width: '20%' }}>Created On</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {groupsData.length > 0 && groupsData.map((group, index) => (
-                                        <TableRow className="table-row" key={index}>
+                                        <TableRow className="table-row" key={index} onClick={() => setOpenGView(group)}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
                                                 {group?.name}
                                             </TableCell>
                                             <TableCell>{group?.ownerEmail}</TableCell>
-                                            <TableCell>{group?.status}</TableCell>
                                             <TableCell>
                                                 {new Date(group?.createdAt).toLocaleString()}
                                             </TableCell>
