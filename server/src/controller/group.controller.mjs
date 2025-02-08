@@ -1,5 +1,6 @@
 import UserModel from "../models/user.model.mjs";
 import GroupModel from "../models/group.model.mjs";
+import RetroModel from "../models/retro.model.mjs";
 import MemberModel from "../models/member.model.mjs";
 import { validateFields } from "../utils/validate.mjs";
 
@@ -78,9 +79,14 @@ const fetchMyGroups = async (req, res, next) => {
 
         const groupDetails = groups.map((member) => member.group);
 
-        return res.status(200).json({
-            groups: groupDetails,
-        });
+        // fetch all retro-boards for each group
+        let retroDetails = [];
+        for (const group of groupDetails) {
+            const retros = await RetroModel.find({ group: group._id });
+            retroDetails = retroDetails.concat(retros);
+        }
+
+        return res.status(200).json({ groups: groupDetails, retros: retroDetails });
 
     } catch (error) {
         next(error);
