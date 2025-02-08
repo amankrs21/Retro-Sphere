@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Grid from '@mui/material/Grid2';
 import {
-    Button, Card, Container, Divider, Typography, Paper, Table,
-    TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
+    Button, Card, Container, Divider, Typography, Paper, Table, Tooltip,
+    TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton
 } from "@mui/material";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -13,6 +14,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useLoading } from '../../hooks/useLoading';
 import GroupAdd from '../../components/group/GroupAdd';
 import GroupView from '../../components/group/GroupView';
+import RetroAdd from '../../components/retro/RetroAdd';
 
 
 // Home page component
@@ -20,9 +22,10 @@ export default function Home() {
 
     document.title = "Retro | Home";
     const { setLoading } = useLoading();
+    const [grData, setGRData] = useState(null);
+    const [openRAdd, setOpenRAdd] = useState(null);
     const [openGAdd, setOpenGAdd] = useState(false);
     const [openGView, setOpenGView] = useState(null);
-    const [groupsData, setGroupsData] = useState([]);
     const { userData, isAuthenticated, http } = useAuth();
 
 
@@ -31,28 +34,29 @@ export default function Home() {
             return;
         }
 
-        const localGroups = JSON.parse(localStorage.getItem('group')) ?? [];
-        if (localGroups.length > 0) {
-            setGroupsData(localGroups);
+        const localData = JSON.parse(localStorage.getItem('retroData')) ?? null;
+        if (localData) {
+            setGRData(localData);
             return;
         }
 
-        handleFetchGroups();
+        handleFetchData();
     }, []);
 
 
-    const handleFetchGroups = async () => {
+    const handleFetchData = async () => {
         try {
             setLoading(true);
             const response = await http.get('/group/fetch');
-            setGroupsData(response?.data?.groups);
-            localStorage.setItem('group', JSON.stringify(response?.data?.groups));
+            setGRData(response?.data);
+            localStorage.setItem('retroData', JSON.stringify(response?.data));
         } catch (error) {
             console.error(error);
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleGroupAdd = async (data) => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -71,7 +75,7 @@ export default function Home() {
             setLoading(true);
             const response = await http.post('/group/add', { name: data.name, members });
             setOpenGAdd(false);
-            handleFetchGroups();
+            handleFetchData();
             toast.success("Group added successfully!");
             if (response.data?.memberNotFound?.length > 0)
                 toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
@@ -84,13 +88,30 @@ export default function Home() {
     };
 
 
+    const handleRetroAdd = async (data) => {
+        try {
+            setLoading(true);
+            const response = await http.post('/retro/add', data);
+            setOpenRAdd(null);
+            handleFetchData();
+            toast.success(response?.data?.message ?? "Retro created successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
     return (
         <Container maxWidth="xl">
             {openGAdd && <GroupAdd openAdd={openGAdd} setOpenAdd={setOpenGAdd} handleAdd={handleGroupAdd} />}
+            {openRAdd !== null && <RetroAdd openAdd={openRAdd} setOpenAdd={setOpenRAdd} handleAdd={handleRetroAdd} />}
             {openGView !== null && <GroupView openData={openGView} setOpenData={setOpenGView} isOwner={openGView?.createdBy === userData?.id} />}
             <Typography variant="h4" align="center" gutterBottom>
                 <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
-                Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
+                Hello {userData ? userData?.name.split(" ")[0] : "Guest"},
                 Welcome to <b className='custom-home-text'>Retro-Sphere!</b> 🚀
             </Typography>
 
@@ -134,7 +155,7 @@ export default function Home() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {groupsData.length > 0 && groupsData.map((group, index) => (
+                                    {grData?.groups?.length > 0 && grData?.groups?.map((group, index) => (
                                         <TableRow className="table-row" key={index} onClick={() => setOpenGView(group)}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
@@ -157,7 +178,7 @@ export default function Home() {
                             <Typography variant="h6" align="center" gutterBottom>
                                 Your Retros 📝
                             </Typography>
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="secondary" onClick={() => setOpenRAdd(grData?.groups)}>
                                 + Create New
                             </Button>
                         </div>
@@ -165,29 +186,35 @@ export default function Home() {
                         <TableContainer component={Paper}>
                             <Table size="small">
                                 <TableHead>
-                                    <TableRow sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
-                                        <TableCell sx={{ width: '5%' }}>#</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Group Name</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Owner</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Status</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Action</TableCell>
+                                    <TableRow sx={{ backgroundColor: '#aa51b9', color: '#fff' }}>
+                                        <TableCell sx={{ width: '3%' }}>#</TableCell>
+                                        <TableCell sx={{ width: '25%' }}>Retro Name</TableCell>
+                                        <TableCell sx={{ width: '25%' }}>Group</TableCell>
+                                        <TableCell sx={{ width: '15%' }}>Status</TableCell>
+                                        <TableCell sx={{ width: '20%' }}>Created On</TableCell>
+                                        <TableCell sx={{ width: '10%' }}>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {[...Array(3)].map((_, index) => (
+                                    {grData?.retros?.length > 0 && grData?.retros?.map((retro, index) => (
                                         <TableRow className="table-row" key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell className="table-cell-group-name">
-                                                Retro {index + 1}
+                                            <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                                                {retro?.name}
                                             </TableCell>
-                                            <TableCell>Owner {index + 1}</TableCell>
-                                            <TableCell>{index == 1 ? 'Completed' : 'Initated'}</TableCell>
                                             <TableCell>
-                                                <Tooltip title="Delete Retro">
-                                                    <Button variant="outlined" color="error" size="small">
-                                                        DELETE
-                                                    </Button>
-                                                </Tooltip>
+                                                {grData?.groups?.find(group => group._id === retro?.group)?.name}
+                                            </TableCell>
+                                            <TableCell>{retro?.status}</TableCell>
+                                            <TableCell>
+                                                {new Date(retro?.createdAt).toLocaleString()}
+                                            </TableCell>
+                                            <TableCell>
+                                                <IconButton aria-label="delete" color='error' disabled={true}>
+                                                    <Tooltip arrow title="Delete this retro">
+                                                        <DeleteIcon />
+                                                    </Tooltip>
+                                                </IconButton>
                                             </TableCell>
                                         </TableRow>
                                     ))}
