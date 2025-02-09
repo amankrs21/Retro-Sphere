@@ -4,8 +4,9 @@ import {
     Button, Card, Container, Divider, Typography, Paper, Table, Tooltip,
     TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton
 } from "@mui/material";
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -21,6 +22,7 @@ import RetroAdd from '../../components/retro/RetroAdd';
 export default function Home() {
 
     document.title = "Retro | Home";
+    const navigate = useNavigate();
     const { setLoading } = useLoading();
     const [grData, setGRData] = useState(null);
     const [openRAdd, setOpenRAdd] = useState(null);
@@ -199,7 +201,8 @@ export default function Home() {
                                     {grData?.retros?.length > 0 && grData?.retros?.map((retro, index) => (
                                         <TableRow className="table-row" key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                                            <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}
+                                                onClick={() => navigate(`/retro/${retro?._id}`)}>
                                                 {retro?.name}
                                             </TableCell>
                                             <TableCell>
