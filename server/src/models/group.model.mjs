@@ -12,7 +12,7 @@ const GroupModel = new mongoose.Schema({
         default: 'active',
     },
     createdBy: {
-        type: mongo.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'UserModel',
         required: true
     },

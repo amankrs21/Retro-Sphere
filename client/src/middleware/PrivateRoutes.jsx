@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 import Header from '../layout/Header';
 import { useAuth } from '../hooks/useAuth';
@@ -10,14 +10,13 @@ import { useAuth } from '../hooks/useAuth';
 // PrivateRoutes component to protect routes
 export default function PrivateRoutes() {
 
-    const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, logout } = useAuth();
 
     useEffect(() => {
         if (!isAuthenticated) {
-            navigate('/login');
+            logout();
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, logout]);
 
     if (!isAuthenticated) {
         return null;

@@ -1,30 +1,119 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Grid from '@mui/material/Grid2';
 import {
-    Button, Card, Container, Divider, Typography, Paper, Table,
-    TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip
+    Button, Card, Container, Divider, Typography, Paper, Table, Tooltip,
+    TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton
 } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import './Home.css';
 import { useAuth } from '../../hooks/useAuth';
+import { useLoading } from '../../hooks/useLoading';
+import GroupAdd from '../../components/group/GroupAdd';
+import GroupView from '../../components/group/GroupView';
+import RetroAdd from '../../components/retro/RetroAdd';
 
 
 // Home page component
 export default function Home() {
 
     document.title = "Retro | Home";
-    const { userData, isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+    const { setLoading } = useLoading();
+    const [grData, setGRData] = useState(null);
+    const [openRAdd, setOpenRAdd] = useState(null);
+    const [openGAdd, setOpenGAdd] = useState(false);
+    const [openGView, setOpenGView] = useState(null);
+    const { userData, isAuthenticated, http } = useAuth();
 
-    if (!isAuthenticated) {
-        window.location.href = '/login';
-        return null;
+
+    useEffect(() => {
+        if (!isAuthenticated || !userData || !http.defaults.headers.common.Authorization) {
+            return;
+        }
+
+        const localData = JSON.parse(localStorage.getItem('retroData')) ?? null;
+        if (localData) {
+            setGRData(localData);
+            return;
+        }
+
+        handleFetchData();
+    }, []);
+
+
+    const handleFetchData = async () => {
+        try {
+            setLoading(true);
+            const response = await http.get('/group/fetch');
+            setGRData(response?.data);
+            localStorage.setItem('retroData', JSON.stringify(response?.data));
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const handleGroupAdd = async (data) => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        const members = data.members
+            .split(',')
+            .map(email => email.trim().replace(/^"|"$/g, ''))
+            .filter(email => emailRegex.test(email));
+
+        if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {
+            toast.info("Invalid email(s) entered. Please check and try again.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await http.post('/group/add', { name: data.name, members });
+            setOpenGAdd(false);
+            handleFetchData();
+            toast.success("Group added successfully!");
+            if (response.data?.memberNotFound?.length > 0)
+                toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const handleRetroAdd = async (data) => {
+        try {
+            setLoading(true);
+            const response = await http.post('/retro/add', data);
+            setOpenRAdd(null);
+            handleFetchData();
+            toast.success(response?.data?.message ?? "Retro created successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     }
+
 
     return (
         <Container maxWidth="xl">
+            {openGAdd && <GroupAdd openAdd={openGAdd} setOpenAdd={setOpenGAdd} handleAdd={handleGroupAdd} />}
+            {openRAdd !== null && <RetroAdd openAdd={openRAdd} setOpenAdd={setOpenRAdd} handleAdd={handleRetroAdd} />}
+            {openGView !== null && <GroupView openData={openGView} setOpenData={setOpenGView} isOwner={openGView?.createdBy === userData?.id} />}
             <Typography variant="h4" align="center" gutterBottom>
                 <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
-                Hello {userData ? userData?.name.split(" ")[1] : "Guest"},
+                Hello {userData ? userData?.name.split(" ")[0] : "Guest"},
                 Welcome to <b className='custom-home-text'>Retro-Sphere!</b> 🚀
             </Typography>
 
@@ -52,7 +141,7 @@ export default function Home() {
                             <Typography variant="h6" align="center" gutterBottom>
                                 Your Groups 🌟
                             </Typography>
-                            <Button variant="contained" color="success">
+                            <Button variant="contained" color="success" onClick={() => setOpenGAdd(!openGAdd)}>
                                 + Create New
                             </Button>
                         </div>
@@ -62,27 +151,21 @@ export default function Home() {
                                 <TableHead>
                                     <TableRow sx={{ backgroundColor: '#4caf50', color: '#fff' }}>
                                         <TableCell sx={{ width: '5%' }}>#</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Group Name</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Owner</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Status</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Action</TableCell>
+                                        <TableCell sx={{ width: '33%' }}>Group Name</TableCell>
+                                        <TableCell sx={{ width: '40%' }}>Owner</TableCell>
+                                        <TableCell sx={{ width: '20%' }}>Created On</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {[...Array(3)].map((_, index) => (
-                                        <TableRow className="table-row" key={index}>
+                                    {grData?.groups?.length > 0 && grData?.groups?.map((group, index) => (
+                                        <TableRow className="table-row" key={index} onClick={() => setOpenGView(group)}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell className="table-cell-group-name">
-                                                Group {index + 1}
+                                            <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
+                                                {group?.name}
                                             </TableCell>
-                                            <TableCell>Owner {index + 1}</TableCell>
-                                            <TableCell>{index == 1 ? 'Inactive' : 'Active'}</TableCell>
+                                            <TableCell>{group?.ownerEmail}</TableCell>
                                             <TableCell>
-                                                <Tooltip title="Delete Group">
-                                                    <Button variant="outlined" color="error" size="small">
-                                                        DELETE
-                                                    </Button>
-                                                </Tooltip>
+                                                {new Date(group?.createdAt).toLocaleString()}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -97,7 +180,7 @@ export default function Home() {
                             <Typography variant="h6" align="center" gutterBottom>
                                 Your Retros 📝
                             </Typography>
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="secondary" onClick={() => setOpenRAdd(grData?.groups)}>
                                 + Create New
                             </Button>
                         </div>
@@ -105,29 +188,36 @@ export default function Home() {
                         <TableContainer component={Paper}>
                             <Table size="small">
                                 <TableHead>
-                                    <TableRow sx={{ backgroundColor: '#1976d2', color: '#fff' }}>
-                                        <TableCell sx={{ width: '5%' }}>#</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Group Name</TableCell>
-                                        <TableCell sx={{ width: '30%' }}>Owner</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Status</TableCell>
-                                        <TableCell sx={{ width: '20%' }}>Action</TableCell>
+                                    <TableRow sx={{ backgroundColor: '#aa51b9', color: '#fff' }}>
+                                        <TableCell sx={{ width: '3%' }}>#</TableCell>
+                                        <TableCell sx={{ width: '25%' }}>Retro Name</TableCell>
+                                        <TableCell sx={{ width: '25%' }}>Group</TableCell>
+                                        <TableCell sx={{ width: '15%' }}>Status</TableCell>
+                                        <TableCell sx={{ width: '20%' }}>Created On</TableCell>
+                                        <TableCell sx={{ width: '10%' }}>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {[...Array(3)].map((_, index) => (
+                                    {grData?.retros?.length > 0 && grData?.retros?.map((retro, index) => (
                                         <TableRow className="table-row" key={index}>
                                             <TableCell>{index + 1}</TableCell>
-                                            <TableCell className="table-cell-group-name">
-                                                Retro {index + 1}
+                                            <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}
+                                                onClick={() => navigate(`/retro/${retro?._id}`)}>
+                                                {retro?.name}
                                             </TableCell>
-                                            <TableCell>Owner {index + 1}</TableCell>
-                                            <TableCell>{index == 1 ? 'Completed' : 'Initated'}</TableCell>
                                             <TableCell>
-                                                <Tooltip title="Delete Retro">
-                                                    <Button variant="outlined" color="error" size="small">
-                                                        DELETE
-                                                    </Button>
-                                                </Tooltip>
+                                                {grData?.groups?.find(group => group._id === retro?.group)?.name}
+                                            </TableCell>
+                                            <TableCell>{retro?.status}</TableCell>
+                                            <TableCell>
+                                                {new Date(retro?.createdAt).toLocaleString()}
+                                            </TableCell>
+                                            <TableCell>
+                                                <IconButton aria-label="delete" color='error' disabled={true}>
+                                                    <Tooltip arrow title="Delete this retro">
+                                                        <DeleteIcon />
+                                                    </Tooltip>
+                                                </IconButton>
                                             </TableCell>
                                         </TableRow>
                                     ))}

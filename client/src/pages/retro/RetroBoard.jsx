@@ -1,26 +1,75 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Grid from '@mui/material/Grid2';
 import Typewriter from "typewriter-effect";
-import { Typography, Container, Divider, Card } from '@mui/material';
+import { Typography, Container, Divider, Card, Button } from '@mui/material';
 
 import './Retro.css';
 import RetroMood from './RetroMood';
 import RetroReview from './RetroReview';
 import { useAuth } from '../../hooks/useAuth';
 import { useRetroSocket } from '../../hooks/useRetroSocket';
+import { useEffect, useState } from 'react';
+import { useLoading } from '../../hooks/useLoading';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
 // RetroBoard page component
 export default function RetroBoard() {
 
-    document.title = "Retro-Board | PIM Essentials";
+    const navigate = useNavigate();
+    const { setLoading } = useLoading();
+    const [rData, setRData] = useState(null);
+    const { isAuthenticated, userData, http } = useAuth();
 
-    const retroId = "0987654321";
-    const { isAuthenticated } = useAuth();
+    document.title = `Retro | ${rData?.retro?.name}`;
+    const retroId = window.location.pathname.split('/').pop() ?? null;
+
+    useEffect(() => {
+        if (!isAuthenticated || !retroId || !http.defaults.headers.common.Authorization) {
+            return;
+        }
+
+        const fetchIntialData = async () => {
+            try {
+                setLoading(true);
+                const response = await http.get(`/retro/${retroId}`);
+                setRData(response?.data);
+            } catch (error) {
+                console.error(error);
+                if (error?.response?.data?.message === 'Invalid Path') {
+                    toast.error('Please select a valid retro board');
+                    navigate('/retro', { replace: true });
+                    return;
+                }
+                toast.error(error?.response?.data?.message ?? 'Something went wrong');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchIntialData();
+    }, [http, retroId]);
+
+
     const { retroData, updateMood, addReview, updateReview } = useRetroSocket(retroId);
 
-    if (!isAuthenticated) {
-        return null;
-    }
+
+    const completeRetro = async () => {
+        try {
+            setLoading(true);
+            await http.patch(`/retro/status/${retroId}`);
+            toast.success('Retro completed successfully');
+            setTimeout(() => {
+                navigate('/home', { replace: true });
+            }, 100);
+        } catch (error) {
+            console.error(error);
+            toast.error('Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     return (
         <Container maxWidth="xl">
@@ -36,15 +85,15 @@ export default function RetroBoard() {
                     }}
                 >
                     <Typography variant="h4" gutterBottom>
-                        Retro-Board | PIM Essentials
+                        {rData?.group?.name} | {rData?.retro?.name}
                     </Typography>
                     <Typography variant="subtitle1" color='warning' gutterBottom>
                         <Typewriter
                             options={{
                                 strings: [
-                                    'Welcome to Retro-Board 🤖',
+                                    `Welcome ${userData?.name}, to Retro-Board 🤖`,
                                     'How do you feel about the sprint?',
-                                    'Share your thoughts, ideas, and feedback',
+                                    'Share your valuable thoughts, ideas, and feedback',
                                 ],
                                 autoStart: true,
                                 loop: true,
@@ -100,6 +149,10 @@ export default function RetroBoard() {
                         updateReview={(text, index) => updateReview('appreciation', text, index)}
                     />
                 </Grid>
+                <Button fullWidth variant='contained' color='secondary' sx={{ mt: 2 }}
+                    onClick={() => completeRetro()}>
+                    Complete Retro {rData?.retro?.name}
+                </Button>
             </Card>
         </Container>
     );

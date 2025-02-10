@@ -8,18 +8,13 @@ const RetroModel = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['active', 'inactive'],
+        enum: ['active', 'completed'],
         default: 'active',
     },
-    groupId: {
-        type: mongo.Schema.Types.ObjectId,
-        ref: 'GroupModel',
-        required: true
-    },
-    createdBy: {
-        type: mongo.Schema.Types.ObjectId,
-        ref: 'UserModel',
-        required: true
+    group: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "GroupModel",
+        required: true,
     },
     createdAt: {
         type: Date,
