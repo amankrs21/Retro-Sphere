@@ -2,16 +2,16 @@
 import Grid from '@mui/material/Grid2';
 import Typewriter from "typewriter-effect";
 import { Typography, Container, Divider, Card, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import './Retro.css';
 import RetroMood from './RetroMood';
 import RetroReview from './RetroReview';
 import { useAuth } from '../../hooks/useAuth';
-import { useRetroSocket } from '../../hooks/useRetroSocket';
-import { useEffect, useState } from 'react';
 import { useLoading } from '../../hooks/useLoading';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { useRetroSocket } from '../../hooks/useRetroSocket';
 
 
 // RetroBoard page component
@@ -20,13 +20,13 @@ export default function RetroBoard() {
     const navigate = useNavigate();
     const { setLoading } = useLoading();
     const [rData, setRData] = useState(null);
-    const { isAuthenticated, userData, http } = useAuth();
+    const { userData, http } = useAuth();
 
     document.title = `Retro | ${rData?.retro?.name}`;
     const retroId = window.location.pathname.split('/').pop() ?? null;
 
     useEffect(() => {
-        if (!isAuthenticated || !retroId || !http.defaults.headers.common.Authorization) {
+        if (!retroId || !http.defaults.headers.common.Authorization) {
             return;
         }
 
@@ -48,7 +48,7 @@ export default function RetroBoard() {
             }
         };
         fetchIntialData();
-    }, [http, retroId]);
+    }, [http.defaults.headers.common.Authorization, retroId]);
 
 
     const { retroData, updateMood, addReview, updateReview } = useRetroSocket(retroId);
@@ -100,7 +100,6 @@ export default function RetroBoard() {
                                 deleteSpeed: 50,
                             }}
                         />
-
                     </Typography>
                 </Grid>
 

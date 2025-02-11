@@ -1,28 +1,28 @@
+import { useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
 import {
     Typography, Container, Divider, Card, Accordion, AccordionSummary,
-    AccordionDetails,
-    Button
+    AccordionDetails, Button
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate } from 'react-router-dom';
 
 import './Retro.css';
-import { useAuth } from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 
 
 // Retro page component
 export default function Retro() {
 
     document.title = "Retro | Board";
-
-    const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { navigate } = useNavigate();
     const locaData = JSON.parse(localStorage.getItem('retroData')) ?? null;
 
-    if (!isAuthenticated || !locaData) {
-        navigate('/');
-    }
+    useEffect(() => {
+
+        if (!locaData) return;
+
+    }, [locaData]);
+
 
     return (
         <Container maxWidth="md">

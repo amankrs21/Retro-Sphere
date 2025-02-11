@@ -33,7 +33,6 @@ export default function Home() {
 
     useEffect(() => {
         if (!http.defaults.headers.common.Authorization) {
-            console.log("User not authenticated. Skipping data fetch.");
             return;
         }
 
