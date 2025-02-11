@@ -1,4 +1,3 @@
-import UserModel from "../models/user.model.mjs";
 import GroupModel from "../models/group.model.mjs";
 import RetroModel from "../models/retro.model.mjs";
 import MemberModel from "../models/member.model.mjs";

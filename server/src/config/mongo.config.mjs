@@ -13,17 +13,5 @@ const mongoConnect = async () => {
 }
 
 
-// // MongoDB Disconnection Function
-// const mongoDisconnect = async () => {
-//     try {
-//         await mongoose.disconnect();
-//         console.info('MongoDB Disconnected Successfully!!');
-//     }
-//     catch (error) {
-//         console.warn('MongoDB Disconnection FAILED!! \n', error);
-//     }
-// }
-
-
 // Exporting MongoDB Connection and Disconnection Functions
 export default mongoConnect;

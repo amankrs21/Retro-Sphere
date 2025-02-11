@@ -118,7 +118,7 @@ export default function GroupView({ openData, setOpenData, isOwner }) {
                         </TableHead>
                         <TableBody>
                             {members?.length > 0 && members.map((member, index) => (
-                                <TableRow className="table-row" key={index}>
+                                <TableRow className="table-row" key={crypto.randomUUID()}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
                                         {member?.name}

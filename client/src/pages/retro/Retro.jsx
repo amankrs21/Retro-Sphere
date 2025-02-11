@@ -39,8 +39,8 @@ export default function Retro() {
                 <Typography variant="h5" gutterBottom>
                     Current ongoing sprints are listed below
                 </Typography>
-                {locaData?.retros?.length > 0 && locaData?.retros?.map((retro, index) => (
-                    <Accordion expanded key={index}>
+                {locaData?.retros?.length > 0 && locaData?.retros?.map((retro) => (
+                    <Accordion expanded key={crypto.randomUUID()}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Typography variant='h6' color='secondary'>
