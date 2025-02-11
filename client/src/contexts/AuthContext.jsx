@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// /* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
@@ -6,11 +7,11 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 
 
-// Create context with proper typing
 const AuthContext = createContext({
+    http: null,
     token: null,
     userData: null,
-    http: null,
+    isAuthLoading: true,
     isAuthenticated: false,
     login: () => { },
     logout: () => { },
@@ -19,15 +20,16 @@ const AuthContext = createContext({
 });
 export { AuthContext };
 
-// Export the context
+
 export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
-    const [token, setToken] = useState(() => localStorage.getItem('token'));
     const [userData, setUserData] = useState(null);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
+    const [token, setToken] = useState(() => localStorage.getItem('token'));
 
     const http = useMemo(() => {
         const instance = axios.create({
-            baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
+            baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api',
             withCredentials: true,
         });
 
@@ -35,11 +37,9 @@ export const AuthProvider = ({ children }) => {
             response => response,
             error => {
                 if (!error.response && error.message === "Network Error") {
-                    // Network error
                     localStorage.clear();
                     navigate("/503");
-                } else if (error.response.status === 401) {
-                    // Unauthorized
+                } else if (error.response?.status === 401) {
                     localStorage.clear();
                     window.location.href = '/login';
                 }
@@ -51,7 +51,10 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const validateToken = async () => {
-            if (!token) return;
+            if (!token) {
+                setIsAuthLoading(false);
+                return;
+            }
 
             try {
                 const decoded = jwtDecode(token);
@@ -65,6 +68,8 @@ export const AuthProvider = ({ children }) => {
             } catch (error) {
                 console.error('Invalid token:', error);
                 logout();
+            } finally {
+                setIsAuthLoading(false);
             }
         };
 
@@ -85,19 +90,25 @@ export const AuthProvider = ({ children }) => {
     };
 
     const value = useMemo(() => ({
+        http,
         token,
         userData,
-        http,
+        isAuthLoading,
         isAuthenticated: !!token,
         login,
         logout,
         baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
         baseWSURL: import.meta.env.VITE_WS_URL ?? 'ws://localhost:3001'
-    }), [token, userData, http]);
+    }), [token, userData, http, isAuthLoading]);
 
     return (
         <AuthContext.Provider value={value}>
-            {children}
+            {!isAuthLoading ?
+                children :
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    Validating Session...
+                </div>
+            }
         </AuthContext.Provider>
     );
 };

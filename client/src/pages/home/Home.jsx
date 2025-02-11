@@ -24,15 +24,16 @@ export default function Home() {
     document.title = "Retro | Home";
     const navigate = useNavigate();
     const { setLoading } = useLoading();
+    const { http, userData } = useAuth();
     const [grData, setGRData] = useState(null);
     const [openRAdd, setOpenRAdd] = useState(null);
     const [openGAdd, setOpenGAdd] = useState(false);
     const [openGView, setOpenGView] = useState(null);
-    const { isAuthenticated, http, userData } = useAuth();
 
 
     useEffect(() => {
-        if (!isAuthenticated || !http.defaults.headers.common.Authorization) {
+        if (!http.defaults.headers.common.Authorization) {
+            console.log("User not authenticated. Skipping data fetch.");
             return;
         }
 
@@ -43,7 +44,7 @@ export default function Home() {
         }
 
         handleFetchData();
-    }, []);
+    }, [http.defaults.headers.common.Authorization]);
 
 
     const handleFetchData = async () => {
