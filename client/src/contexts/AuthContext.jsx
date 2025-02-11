@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
                 const decoded = jwtDecode(token);
                 if (decoded.exp * 1000 < Date.now()) {
                     logout();
+                    alert('Session expired. Please login again.');
                 } else {
                     setUserData(decoded);
                     http.defaults.headers.common.Authorization = `Bearer ${token}`;

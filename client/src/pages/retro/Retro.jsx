@@ -46,7 +46,7 @@ export default function Retro() {
                                 <Typography variant='h6' color='secondary'>
                                     Retro Name: {retro.name}
                                 </Typography>
-                                <Typography variant='h6' color='success' fontWeight={600}>[ACTIVE]</Typography>
+                                <Typography variant='h6' color='success' fontWeight={600}>[{retro?.status}]</Typography>
                             </div>
                         </AccordionSummary>
                         <AccordionDetails sx={{ mt: -2 }}>

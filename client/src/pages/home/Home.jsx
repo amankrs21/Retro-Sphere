@@ -28,11 +28,11 @@ export default function Home() {
     const [openRAdd, setOpenRAdd] = useState(null);
     const [openGAdd, setOpenGAdd] = useState(false);
     const [openGView, setOpenGView] = useState(null);
-    const { userData, isAuthenticated, http } = useAuth();
+    const { isAuthenticated, http, userData } = useAuth();
 
 
     useEffect(() => {
-        if (!isAuthenticated || !userData || !http.defaults.headers.common.Authorization) {
+        if (!isAuthenticated || !http.defaults.headers.common.Authorization) {
             return;
         }
 
