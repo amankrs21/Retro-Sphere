@@ -65,7 +65,7 @@ export default function Home() {
 
         const members = data.members
             .split(',')
-            .map(email => email.trim().replace(/^("|')|("|')$/g, ''))
+            .map(email => email.trim().replace(/^["']|["']$/g, ''))
             .filter(email => emailRegex.test(email));
 
         if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {
