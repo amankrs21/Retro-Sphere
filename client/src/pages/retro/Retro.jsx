@@ -13,8 +13,8 @@ import './Retro.css';
 // Retro page component
 export default function Retro() {
 
-    document.title = "Retro | Board";
-    const { navigate } = useNavigate();
+    document.title = "Retro | Boards";
+    const navigate = useNavigate();
     const locaData = JSON.parse(localStorage.getItem('retroData')) ?? null;
 
     useEffect(() => {
