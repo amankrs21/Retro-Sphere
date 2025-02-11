@@ -61,21 +61,23 @@ export default function Login() {
     };
 
     const googleLogin = useGoogleLogin({
-        onSuccess: async (authResult) => {
-            try {
-                setLoading(true);
-                const response = await http.post('/auth/google-login', { token: authResult.code });
-                if (response.data.token) {
-                    login(response.data.token);
-                    toast.success(response.data.message);
-                    navigate('/home');
+        onSuccess: (authResult) => {
+            (async () => {
+                try {
+                    setLoading(true);
+                    const response = await http.post('/auth/google-login', { token: authResult.code });
+                    if (response.data.token) {
+                        login(response.data.token);
+                        toast.success(response.data.message);
+                        navigate('/home');
+                    }
+                } catch (error) {
+                    console.error("Google login failed:", error);
+                    toast.error('Error during Google login');
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error("Google login failed:", error);
-                toast.error('Error during Google login');
-            } finally {
-                setLoading(false);
-            }
+            })();
         },
         onError: () => {
             toast.error('Google login failed');

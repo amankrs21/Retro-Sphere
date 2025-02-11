@@ -10,13 +10,14 @@ import { useAuth } from '../hooks/useAuth';
 // PrivateRoutes component to protect routes
 export default function PrivateRoutes() {
 
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthLoading, isAuthenticated, logout } = useAuth();
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            logout();
-        }
-    }, [isAuthenticated, logout]);
+        if (isAuthLoading) return;
+
+        if (!isAuthenticated) logout();
+
+    }, [isAuthLoading, isAuthenticated, logout]);
 
     if (!isAuthenticated) {
         return null;

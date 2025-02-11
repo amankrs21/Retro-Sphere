@@ -1,28 +1,28 @@
+import { useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
 import {
     Typography, Container, Divider, Card, Accordion, AccordionSummary,
-    AccordionDetails,
-    Button
+    AccordionDetails, Button
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate } from 'react-router-dom';
 
 import './Retro.css';
-import { useAuth } from '../../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 
 
 // Retro page component
 export default function Retro() {
 
-    document.title = "Retro | Board";
-
+    document.title = "Retro | Boards";
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
     const locaData = JSON.parse(localStorage.getItem('retroData')) ?? null;
 
-    if (!isAuthenticated || !locaData) {
-        navigate('/');
-    }
+    useEffect(() => {
+
+        if (!locaData) return;
+
+    }, [locaData]);
+
 
     return (
         <Container maxWidth="md">
@@ -39,14 +39,14 @@ export default function Retro() {
                 <Typography variant="h5" gutterBottom>
                     Current ongoing sprints are listed below
                 </Typography>
-                {locaData?.retros?.length > 0 && locaData?.retros?.map((retro, index) => (
-                    <Accordion expanded key={index}>
+                {locaData?.retros?.length > 0 && locaData?.retros?.map((retro) => (
+                    <Accordion expanded key={crypto.randomUUID()}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <Typography variant='h6' color='secondary'>
                                     Retro Name: {retro.name}
                                 </Typography>
-                                <Typography variant='h6' color='success' fontWeight={600}>[ACTIVE]</Typography>
+                                <Typography variant='h6' color='success' fontWeight={600}>[{retro?.status}]</Typography>
                             </div>
                         </AccordionSummary>
                         <AccordionDetails sx={{ mt: -2 }}>

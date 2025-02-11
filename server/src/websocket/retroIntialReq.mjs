@@ -3,7 +3,6 @@ import RetroBoardModel from "../models/board.model.mjs"
 // function to retrieve or create retro board data
 export async function retroIntialReq(retroId) {
 
-    // ['😡', '😠', '😐', '🙂', '🤩'];
     let retroData = await RetroBoardModel.findOne({ retroId: retroId });
     if (!retroData) {
         retroData = new RetroBoardModel({

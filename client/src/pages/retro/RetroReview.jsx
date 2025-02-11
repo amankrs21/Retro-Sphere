@@ -48,7 +48,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
                 </div>
 
                 {data.map((item, index) => (
-                    <CardContent className='retro-comment-cardcontent' key={index}>
+                    <CardContent className='retro-comment-cardcontent' key={crypto.randomUUID()}>
                         {editingIndex === index ? (
                             <div style={{ position: 'relative' }}>
                                 <TextField

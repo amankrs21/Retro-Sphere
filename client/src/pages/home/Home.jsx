@@ -24,15 +24,15 @@ export default function Home() {
     document.title = "Retro | Home";
     const navigate = useNavigate();
     const { setLoading } = useLoading();
+    const { http, userData } = useAuth();
     const [grData, setGRData] = useState(null);
     const [openRAdd, setOpenRAdd] = useState(null);
     const [openGAdd, setOpenGAdd] = useState(false);
     const [openGView, setOpenGView] = useState(null);
-    const { userData, isAuthenticated, http } = useAuth();
 
 
     useEffect(() => {
-        if (!isAuthenticated || !userData || !http.defaults.headers.common.Authorization) {
+        if (!http.defaults.headers.common.Authorization) {
             return;
         }
 
@@ -43,7 +43,7 @@ export default function Home() {
         }
 
         handleFetchData();
-    }, []);
+    }, [http.defaults.headers.common.Authorization]);
 
 
     const handleFetchData = async () => {
@@ -65,7 +65,7 @@ export default function Home() {
 
         const members = data.members
             .split(',')
-            .map(email => email.trim().replace(/^"|"$/g, ''))
+            .map(email => email.trim().replace(/^["']|["']$/g, ''))
             .filter(email => emailRegex.test(email));
 
         if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {
@@ -113,7 +113,7 @@ export default function Home() {
             {openGView !== null && <GroupView openData={openGView} setOpenData={setOpenGView} isOwner={openGView?.createdBy === userData?.id} />}
             <Typography variant="h4" align="center" gutterBottom>
                 <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
-                Hello {userData ? userData?.name.split(" ")[0] : "Guest"},
+                Hello {userData ? userData?.name.split(" ")[0] : "Guest"},&nbsp;
                 Welcome to <b className='custom-home-text'>Retro-Sphere!</b> 🚀
             </Typography>
 
@@ -125,11 +125,11 @@ export default function Home() {
                         <DotLottieReact src="retro-home.json" loop autoplay />
                     </div>
                     <Typography variant="body1" align="justify" mt={2} p={2}>
-                        <b className='custom-home-text'>Retro-Sphere</b> 🎉 is your go-to platform for making sprint retrospectives
-                        <b className='custom-home-text'> engaging, interactive, and insightful. </b>
+                        <b className='custom-home-text'>Retro-Sphere</b>&nbsp;🎉 is your go-to platform for making sprint retrospectives
+                        <b className='custom-home-text'> engaging, interactive, and insightful.</b>&nbsp;
                         Reflect, collaborate, and grow with your team in a vibrant environment tailored for creativity and success.
                         <br />
-                        <b className='custom-home-text'>To get started, create a group or join an existing one. </b>
+                        <b className='custom-home-text'>To get started, create a group or join an existing one.</b>&nbsp;
                         You can also create retrospectives within your groups to reflect on your past sprints and plan for the future.
                     </Typography>
                 </Grid>
@@ -158,7 +158,7 @@ export default function Home() {
                                 </TableHead>
                                 <TableBody>
                                     {grData?.groups?.length > 0 && grData?.groups?.map((group, index) => (
-                                        <TableRow className="table-row" key={index} onClick={() => setOpenGView(group)}>
+                                        <TableRow className="table-row" key={crypto.randomUUID()} onClick={() => setOpenGView(group)}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}>
                                                 {group?.name}
@@ -199,7 +199,7 @@ export default function Home() {
                                 </TableHead>
                                 <TableBody>
                                     {grData?.retros?.length > 0 && grData?.retros?.map((retro, index) => (
-                                        <TableRow className="table-row" key={index}>
+                                        <TableRow className="table-row" key={crypto.randomUUID()}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell sx={{ color: '#1976d2', fontWeight: 'bold' }}
                                                 onClick={() => navigate(`/retro/${retro?._id}`)}>

@@ -37,7 +37,7 @@ export default function ParticleBackground() {
                         value: 80,
                     },
                     shape: {
-                        type: "triangle",
+                        type: "circle",
                     },
                 },
                 detectRetina: true,

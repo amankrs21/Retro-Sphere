@@ -4,9 +4,11 @@ import { updateReview } from "./updateReview.mjs";
 import { validateUser } from "./validateUser.mjs";
 import { retroIntialReq } from "./retroIntialReq.mjs";
 
+
+// store connected clients
+const clients = new Map();
+
 export function setupSocket(io) {
-    // store connected clients
-    const clients = new Map();
 
     // websocket connection handler
     io.on("connection", async (socket, req) => {

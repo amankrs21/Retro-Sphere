@@ -40,8 +40,8 @@ export default function RetroMood({ moods, updateMood }) {
 
     return (
         <Grid container spacing={1}>
-            {moods.map((data, index) => (
-                <Grid key={index}>
+            {moods.map((data) => (
+                <Grid key={crypto.randomUUID()}>
                     <Button
                         variant={data?.emoji === curEmoji ? 'contained' : 'outlined'}
                         onClick={() => { onMoodUpdate(data?.emoji) }}
