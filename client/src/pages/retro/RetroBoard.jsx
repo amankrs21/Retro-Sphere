@@ -97,7 +97,7 @@ export default function RetroBoard() {
                                 ],
                                 autoStart: true,
                                 loop: true,
-                                deleteSpeed: 50,
+                                deleteSpeed: 30,
                             }}
                         />
                     </Typography>
