@@ -60,19 +60,16 @@ export const useRetroSocket = (retroId) => {
 
     // update mood
     const updateMood = (emoji) => {
-        console.log("UPDATING EMOJI", { emoji, email: userData?.email });
         socket?.emit("updateMood", { emoji, email: userData?.email });
     };
 
     // add review
     const addReview = (column, comment) => {
-        console.log("ADDING REVIEW", { column, comment, email: userData?.email });
         socket?.emit("addReview", { column, comment, email: userData?.email });
     };
 
     // update review
     const updateReview = (column, comment, index) => {
-        console.log("UPDATING REVIEW", { column, comment, index, email: userData?.email });
         socket?.emit("updateReview", { column, comment, index, email: userData?.email });
     };
 
