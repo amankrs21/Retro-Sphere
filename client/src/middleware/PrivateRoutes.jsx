@@ -10,14 +10,12 @@ import { useAuth } from '../hooks/useAuth';
 // PrivateRoutes component to protect routes
 export default function PrivateRoutes() {
 
-    const { isAuthLoading, isAuthenticated, logout } = useAuth();
+    const { isAuthLoading, isAuthenticated, http, logout } = useAuth();
 
     useEffect(() => {
-        if (isAuthLoading) return;
-
+        if (isAuthLoading || !http.defaults.headers.common.Authorization) return;
         if (!isAuthenticated) logout();
-
-    }, [isAuthLoading, isAuthenticated, logout]);
+    }, [isAuthLoading, isAuthenticated, http, logout]);
 
     if (!isAuthenticated) {
         return null;
@@ -32,10 +30,16 @@ export default function PrivateRoutes() {
         //     <Footer />
         // </FloatingEmojiProvider>
         <>
-            <Header />
-            <div style={{ marginTop: '9vh', height: '91vh', overflowY: 'auto' }}>
-                <Outlet />
-            </div>
+            {!isAuthLoading && isAuthenticated && http.defaults.headers.common.Authorization ? (
+                <>
+                    <Header />
+                    <div style={{ marginTop: '8vh', height: '92vh', overflowY: 'auto', paddingTop: '5px' }}>
+                        <Outlet />
+                    </div>
+                </>
+            ) :
+                null
+            }
         </>
     );
 };
