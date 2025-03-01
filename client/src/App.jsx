@@ -1,5 +1,5 @@
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, Slide } from 'react-toastify';
 
 import Router from "./Router";
 import Loading from './components/Loading';
@@ -17,7 +17,13 @@ export default function App() {
         <Loading />
         <Router />
       </LoadingProvider>
-      <ToastContainer theme="colored" draggable={false} hideProgressBar={true} position="bottom-right" />
+      <ToastContainer
+        theme="colored"
+        draggable={false}
+        transition={Slide}
+        hideProgressBar={true}
+        position="bottom-right"
+      />
     </ErrorBoundary>
   )
 }
