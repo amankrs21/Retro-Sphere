@@ -1,5 +1,5 @@
 import express from "express";
-import { addMember, createGroup, deleteGroup, deleteMember, fetchGroupMembers, fetchMyGroups } from "../controller/group.controller.mjs";
+import { addMember, createGroup, deleteGroup, deleteMember, fetchGroupMembers, fetchGroupRetros } from "../controller/group.controller.mjs";
 
 
 const groupRoute = express.Router();
@@ -9,7 +9,7 @@ const groupRoute = express.Router();
 groupRoute.post("/add", createGroup);
 
 // fetch my groups route
-groupRoute.get("/fetch", fetchMyGroups);
+groupRoute.get("/fetch", fetchGroupRetros);
 
 // fetch group members route
 groupRoute.get("/fetch/:groupId", fetchGroupMembers);

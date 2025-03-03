@@ -66,7 +66,7 @@ const createGroup = async (req, res, next) => {
 
 
 // fetch my groups
-const fetchMyGroups = async (req, res, next) => {
+const fetchGroupRetros = async (req, res, next) => {
     try {
         const groups = await MemberModel.find({ user: req.currentUser })
             .populate("group")
@@ -207,4 +207,4 @@ const deleteGroup = async (req, res, next) => {
 
 
 // exporting functions
-export { createGroup, fetchMyGroups, fetchGroupMembers, addMember, deleteMember, deleteGroup };
+export { createGroup, fetchGroupRetros, fetchGroupMembers, addMember, deleteMember, deleteGroup };
