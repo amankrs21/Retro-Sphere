@@ -3,12 +3,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Home from './pages/home/Home';
 import Login from './pages/login/Login';
+import Retro from './pages/retro/Retro';
+import Group from './pages/groups/Group';
 import RetroBoard from './pages/retro/RetroBoard';
 import ServerUnavl from './pages/503/ServerUnavl';
 import PageNotFound from './pages/404/PageNotFound';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoutes from './middleware/PrivateRoutes';
-import Retro from './pages/retro/Retro';
 
 
 // Router component to render the application routes
@@ -34,6 +35,7 @@ export default function Router() {
                     <Route path="/" element={<Navigate to="/login" />} />
                     <Route path="/" element={<PrivateRoutes />}>
                         <Route path='/home' element={<Home />} />
+                        <Route path='/group' element={<Group />} />
                         <Route path="/retro" element={<Retro />} />
                         <Route path='/retro/:id' element={<RetroBoard />} />
                     </Route>

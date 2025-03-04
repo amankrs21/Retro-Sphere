@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Grid from '@mui/material/Grid2';
-import Typewriter from "typewriter-effect";
-import { Typography, Container, Divider, Card, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import Typewriter from "typewriter-effect";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Typography, Container, Divider, Card, Button } from '@mui/material';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 import './Retro.css';
 import RetroMood from './RetroMood';
@@ -19,8 +20,9 @@ export default function RetroBoard() {
 
     const navigate = useNavigate();
     const { setLoading } = useLoading();
-    const [rData, setRData] = useState(null);
     const { userData, http } = useAuth();
+    const [rData, setRData] = useState(null);
+    const [isCompleted, setIsCompleted] = useState(false);
 
     document.title = `Retro | ${rData?.retro?.name}`;
     const retroId = window.location.pathname.split('/').pop() ?? null;
@@ -35,6 +37,11 @@ export default function RetroBoard() {
                 setLoading(true);
                 const response = await http.get(`/retro/${retroId}`);
                 setRData(response?.data);
+                if (response?.data?.retro?.status === 'completed') {
+                    setIsCompleted(true);
+                    localStorage.removeItem('retroData');
+                    toast.info('Retro has been completed, you can view the data but cannot edit.');
+                }
             } catch (error) {
                 console.error(error);
                 if (error?.response?.data?.message === 'Invalid Path') {
@@ -48,6 +55,7 @@ export default function RetroBoard() {
             }
         };
         fetchIntialData();
+
     }, [http.defaults.headers.common.Authorization, retroId]);
 
 
@@ -59,6 +67,7 @@ export default function RetroBoard() {
             setLoading(true);
             await http.patch(`/retro/status/${retroId}`);
             toast.success('Retro completed successfully');
+            localStorage.removeItem('retroData');
             setTimeout(() => {
                 navigate('/home', { replace: true });
             }, 100);
@@ -69,6 +78,11 @@ export default function RetroBoard() {
             setLoading(false);
         }
     };
+
+
+    const exportRetroData = () => {
+        toast.info("Feature coming soon!");
+    }
 
 
     return (
@@ -97,7 +111,7 @@ export default function RetroBoard() {
                                 ],
                                 autoStart: true,
                                 loop: true,
-                                deleteSpeed: 50,
+                                deleteSpeed: 30,
                             }}
                         />
                     </Typography>
@@ -111,17 +125,24 @@ export default function RetroBoard() {
                         justifyContent: { xs: "center", md: "flex-end" },
                     }}
                 >
-                    <RetroMood moods={retroData?.moods ?? []} updateMood={updateMood} />
+                    <RetroMood
+                        moods={retroData?.moods ?? []}
+                        isCompleted={isCompleted}
+                        updateMood={updateMood}
+                    />
                 </Grid>
             </Grid>
 
-
             <Divider />
 
-            <Card raised elevation={1} sx={{ mt: 1, p: 1 }}>
+            <Card raised elevation={3} sx={{ mt: 1, p: 1 }}>
+                {isCompleted && <Typography align='center' variant='h6' color='success' sx={{ mb: 1 }}>
+                    {rData?.retro?.name} Retrospective has been completed.
+                </Typography>}
                 <Grid container spacing={1}>
                     <RetroReview
                         title="Start Doing"
+                        isCompleted={isCompleted}
                         data={retroData?.reviews?.startDoing || []}
                         addReview={(text) => addReview('startDoing', text)}
                         updateReview={(text, index) => updateReview('startDoing', text, index)}
@@ -129,6 +150,7 @@ export default function RetroBoard() {
 
                     <RetroReview
                         title="Stop Doing"
+                        isCompleted={isCompleted}
                         data={retroData?.reviews?.stopDoing || []}
                         addReview={(text) => addReview('stopDoing', text)}
                         updateReview={(text, index) => updateReview('stopDoing', text, index)}
@@ -136,6 +158,7 @@ export default function RetroBoard() {
 
                     <RetroReview
                         title="Continue Doing"
+                        isCompleted={isCompleted}
                         data={retroData?.reviews?.continueDoing || []}
                         addReview={(text) => addReview('continueDoing', text)}
                         updateReview={(text, index) => updateReview('continueDoing', text, index)}
@@ -143,15 +166,25 @@ export default function RetroBoard() {
 
                     <RetroReview
                         title="Appreciation"
+                        isCompleted={isCompleted}
                         data={retroData?.reviews?.appreciation || []}
                         addReview={(text) => addReview('appreciation', text)}
                         updateReview={(text, index) => updateReview('appreciation', text, index)}
                     />
                 </Grid>
-                <Button fullWidth variant='contained' color='secondary' sx={{ mt: 2 }}
-                    onClick={() => completeRetro()}>
-                    Complete Retro {rData?.retro?.name}
-                </Button>
+
+                {!isCompleted &&
+                    <Button fullWidth variant='contained' color='success' sx={{ mt: 2, mb: 1 }}
+                        onClick={() => completeRetro()}>
+                        Complete Retro {rData?.retro?.name}
+                    </Button>
+                }
+                {isCompleted &&
+                    <Button fullWidth variant='contained' color='warning' sx={{ mt: 2, mb: 1 }}
+                        onClick={exportRetroData}>
+                        Download Retro Report <CloudDownloadIcon sx={{ ml: 2 }} />
+                    </Button>
+                }
             </Card>
         </Container>
     );

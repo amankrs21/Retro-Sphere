@@ -85,6 +85,7 @@ export default function Login() {
         flow: "auth-code",
     });
 
+    if (isAuthenticated) return null;
 
     return (
         <div className="login-container">

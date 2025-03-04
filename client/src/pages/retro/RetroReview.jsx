@@ -6,15 +6,19 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 
-export default function RetroColumn({ title, data, addReview, updateReview }) {
+export default function RetroColumn({ title, isCompleted, data, addReview, updateReview }) {
 
+    const { userData } = useAuth();
     const [isAddNew, setIsAddNew] = useState(false);
     const [editedValue, setEditedValue] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
 
     const handleEdit = (index, item) => {
+        if (isCompleted) return;
         setEditedValue(item.comment);
         setEditingIndex(index);
         setIsAddNew(false);
@@ -27,6 +31,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
     };
 
     const handleSave = () => {
+        if (isCompleted) return;
         addReview(editedValue);
         setEditingIndex(null);
         setEditedValue('');
@@ -34,6 +39,9 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
     };
 
     const handleUpdate = (item, index) => {
+        if (isCompleted) return;
+        if (item.email !== userData?.email)
+            toast.error('You can only edit your own comments.');
         updateReview(editedValue, index);
         setEditingIndex(null);
         setEditedValue('');
@@ -48,7 +56,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
                 </div>
 
                 {data.map((item, index) => (
-                    <CardContent className='retro-comment-cardcontent' key={crypto.randomUUID()}>
+                    <CardContent className='retro-comment-cardcontent' key={item?._id}>
                         {editingIndex === index ? (
                             <div style={{ position: 'relative' }}>
                                 <TextField
@@ -83,7 +91,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
                 ))}
 
                 <CardContent className='retro-comment-cardcontent'>
-                    {isAddNew ? (
+                    {isAddNew && !isCompleted ? (
                         <div style={{ position: 'relative' }}>
                             <TextField
                                 rows={4}
@@ -105,6 +113,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
                         </div>
                     ) : (
                         <Button fullWidth variant="outlined" size='small'
+                            disabled={isCompleted}
                             onClick={() => {
                                 setIsAddNew(true);
                                 setEditedValue('');
@@ -121,6 +130,7 @@ export default function RetroColumn({ title, data, addReview, updateReview }) {
 
 RetroColumn.propTypes = {
     title: PropTypes.string.isRequired,
+    isCompleted: PropTypes.bool.isRequired,
     data: PropTypes.array.isRequired,
     addReview: PropTypes.func.isRequired,
     updateReview: PropTypes.func.isRequired

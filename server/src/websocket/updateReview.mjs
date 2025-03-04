@@ -24,6 +24,5 @@ export async function updateReview(retroId, data) {
     }
 
     const postData = await RetroBoardModel.findOne({ retroId });
-    console.log("Updated Review:", postData.reviews);
     return postData.reviews;
 }

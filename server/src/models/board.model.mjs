@@ -8,11 +8,6 @@ const ReviewSchema = new mongoose.Schema({
 
 
 const RetroBoardModel = new mongoose.Schema({
-    // retroId: {
-    //     type: mongo.Schema.Types.ObjectId,
-    //     ref: 'RetroModel',
-    //     required: true
-    // },
     retroId: {
         type: String,
         required: true,

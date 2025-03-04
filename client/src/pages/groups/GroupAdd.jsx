@@ -1,9 +1,47 @@
-import PropTypes from 'prop-types';
 import {
     Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button
 } from '@mui/material';
+import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 
-export default function GroupAdd({ openAdd, setOpenAdd, handleAdd }) {
+import { useAuth } from '../../hooks/useAuth';
+import { useLoading } from '../../hooks/useLoading';
+
+
+export default function GroupAdd({ openAdd, setOpenAdd }) {
+
+    const { http } = useAuth();
+    const { setLoading } = useLoading();
+
+    const handleGroupAdd = async (data) => {
+        const rRegex = /^(?:["'])|(?:["'])$/g;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        const members = data.members
+            .split(',')
+            .map(email => email.trim().replace(rRegex, '')) // Now correctly removes both leading & trailing quotes
+            .filter(email => emailRegex.test(email));
+
+        if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {
+            toast.info("Invalid email(s) entered. Please check and try again.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await http.post('/group/add', { name: data.name, members });
+            localStorage.removeItem('retroData');
+            toast.success("Group added successfully!");
+            setOpenAdd(false);
+            if (response.data?.memberNotFound?.length > 0)
+                toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Dialog
@@ -18,7 +56,7 @@ export default function GroupAdd({ openAdd, setOpenAdd, handleAdd }) {
                         event.preventDefault();
                         const formData = new FormData(event.currentTarget);
                         const formJson = Object.fromEntries(formData.entries());
-                        handleAdd(formJson);
+                        handleGroupAdd(formJson);
                     },
                 }
             }}
@@ -59,6 +97,5 @@ export default function GroupAdd({ openAdd, setOpenAdd, handleAdd }) {
 
 GroupAdd.propTypes = {
     openAdd: PropTypes.bool.isRequired,
-    setOpenAdd: PropTypes.func.isRequired,
-    handleAdd: PropTypes.func.isRequired
+    setOpenAdd: PropTypes.func.isRequired
 };
