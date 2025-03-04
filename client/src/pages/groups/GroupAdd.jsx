@@ -29,8 +29,9 @@ export default function GroupAdd({ openAdd, setOpenAdd }) {
         try {
             setLoading(true);
             const response = await http.post('/group/add', { name: data.name, members });
+            localStorage.removeItem('retroData');
             toast.success("Group added successfully!");
-            openAdd(false);
+            setOpenAdd(false);
             if (response.data?.memberNotFound?.length > 0)
                 toast.info(`The following members were not found: ${response.data.memberNotFound.join(', ')}`);
         } catch (error) {
