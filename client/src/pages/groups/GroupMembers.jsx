@@ -120,7 +120,7 @@ export default function GroupMembers({ groupId, setGroupChanged, members, isOwne
                                 endAdornment: (
                                     <InputAdornment position="end">
                                         <Button variant="contained" color="primary" loadingPosition="start"
-                                            loading={tempLoad} onClick={() => addMember(newMember)}>
+                                            loading={tempLoad} onClick={() => addMember()}>
                                             ADD
                                         </Button>
                                     </InputAdornment>

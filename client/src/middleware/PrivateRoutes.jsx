@@ -13,8 +13,8 @@ export default function PrivateRoutes() {
     const { isAuthLoading, isAuthenticated, http, logout } = useAuth();
 
     useEffect(() => {
-        if (isAuthLoading || !http.defaults.headers.common.Authorization) return;
         if (!isAuthenticated) logout();
+        if (isAuthLoading || !http.defaults.headers.common.Authorization) return;
     }, [isAuthLoading, isAuthenticated, http, logout]);
 
     if (!isAuthenticated) {
