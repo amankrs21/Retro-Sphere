@@ -44,6 +44,5 @@ export async function updateMood(retroId, data) {
     );
 
     const retroData = await RetroBoardModel.findOne({ retroId });
-    console.log("Updated Emoji:", retroData.moods);
     return retroData.moods;
 }

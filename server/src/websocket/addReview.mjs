@@ -17,6 +17,5 @@ export async function addReview(retroId, data) {
     }
 
     const retroData = await RetroBoardModel.findOne({ retroId });
-    console.log("Add Review:", retroData.reviews);
     return retroData.reviews;
 }
