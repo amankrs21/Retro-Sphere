@@ -14,11 +14,12 @@ export default function GroupAdd({ openAdd, setOpenAdd }) {
     const { setLoading } = useLoading();
 
     const handleGroupAdd = async (data) => {
+        const rRegex = /^["']|["']$/g;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         const members = data.members
             .split(',')
-            .map(email => email.trim().replace(/^["']|["']$/g, ''))
+            .map(email => email.trim().replace(rRegex, '')) // Now correctly removes both leading & trailing quotes
             .filter(email => emailRegex.test(email));
 
         if (members.length === 0 || data.members.trim() === "" || members.some(email => email === "")) {

@@ -45,8 +45,8 @@ export default function Retro() {
                                     </AccordionSummary>
                                     <AccordionDetails sx={{ mt: -2 }}>
                                         <Typography variant="body1" color="text.secondary">
-                                            <span>Belongs to Group -
-                                                <b>&nbsp;{locaData?.groups?.find(group => group._id === retro?.group)?.name || 'Unknown'}</b>
+                                            <span>Belongs to Group -{' '}
+                                                <b>{locaData?.groups?.find(group => group._id === retro?.group)?.name || 'Unknown'}</b>
                                             </span><br />
                                             <span style={{ fontSize: '16px', marginTop: '5px' }}>
                                                 Created On - <b>{new Date(retro?.createdAt).toLocaleString()}</b>
