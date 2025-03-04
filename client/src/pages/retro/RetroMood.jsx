@@ -17,12 +17,13 @@ const CartBadge = styled(Badge)`
 
 
 // RetroMood component
-export default function RetroMood({ moods, updateMood }) {
+export default function RetroMood({ moods, isCompleted, updateMood }) {
 
     const { userData } = useAuth();
     const [curEmoji, setCurEmoji] = useState(null);
 
     const onMoodUpdate = (emoji) => {
+        if (isCompleted) return;
         setCurEmoji(emoji);
         updateMood(emoji);
     };
@@ -41,12 +42,13 @@ export default function RetroMood({ moods, updateMood }) {
     return (
         <Grid container spacing={1}>
             {moods.map((data) => (
-                <Grid key={crypto.randomUUID()}>
-                    <Tooltip title={data?.users?.join(', ')}>
+                <Grid key={data?.emoji}>
+                    <Tooltip arrow title={data?.users?.join(', ')}>
                         <Button
                             variant={data?.emoji === curEmoji ? 'contained' : 'outlined'}
                             onClick={() => { onMoodUpdate(data?.emoji) }}
                             style={{ fontSize: '2rem' }}
+                            disabled={isCompleted}
                         >
                             <CartBadge
                                 color="secondary"
@@ -64,5 +66,6 @@ export default function RetroMood({ moods, updateMood }) {
 
 RetroMood.propTypes = {
     moods: PropTypes.array.isRequired,
+    isCompleted: PropTypes.bool.isRequired,
     updateMood: PropTypes.func.isRequired,
 };
