@@ -9,6 +9,11 @@
     padding: 10px;
 }
 
+.home-table {
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
 .home-group-header {
     display: flex;
     align-items: center;

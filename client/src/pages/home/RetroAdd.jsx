@@ -1,13 +1,35 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import {
     Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button,
     FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
-import { useState } from 'react';
 
-export default function RetroAdd({ openAdd, setOpenAdd, handleAdd }) {
+import { useAuth } from '../../hooks/useAuth';
+import { useLoading } from '../../hooks/useLoading';
 
+
+export default function RetroAdd({ openAdd, setOpenAdd }) {
+
+    const { http } = useAuth();
+    const { setLoading } = useLoading();
     const [group, setGroup] = useState('');
+
+    const handleRetroAdd = async (data) => {
+        try {
+            setLoading(true);
+            const response = await http.post('/retro/add', data);
+            localStorage.removeItem('retroData');
+            setOpenAdd(null);
+            toast.success(response?.data?.message ?? "Retro created successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <Dialog
@@ -23,7 +45,7 @@ export default function RetroAdd({ openAdd, setOpenAdd, handleAdd }) {
                         const formData = new FormData(event.currentTarget);
                         const formJson = Object.fromEntries(formData.entries());
                         formJson.groupId = group;
-                        handleAdd(formJson);
+                        handleRetroAdd(formJson);
                     },
                 }
             }}
@@ -49,7 +71,6 @@ export default function RetroAdd({ openAdd, setOpenAdd, handleAdd }) {
                 </FormControl>
                 <TextField
                     required
-                    autoFocus
                     fullWidth
                     name="name"
                     variant="outlined"
@@ -66,6 +87,5 @@ export default function RetroAdd({ openAdd, setOpenAdd, handleAdd }) {
 
 RetroAdd.propTypes = {
     openAdd: PropTypes.array.isRequired,
-    setOpenAdd: PropTypes.func.isRequired,
-    handleAdd: PropTypes.func.isRequired
+    setOpenAdd: PropTypes.func.isRequired
 };
