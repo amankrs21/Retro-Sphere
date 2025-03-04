@@ -14,7 +14,7 @@ export default function GroupAdd({ openAdd, setOpenAdd }) {
     const { setLoading } = useLoading();
 
     const handleGroupAdd = async (data) => {
-        const rRegex = /^["']|["']$/g;
+        const rRegex = /^(?:["'])|(?:["'])$/g;
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         const members = data.members
