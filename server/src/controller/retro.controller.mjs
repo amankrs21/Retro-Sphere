@@ -1,6 +1,7 @@
 import GroupModel from "../models/group.model.mjs";
 import RetroModel from "../models/retro.model.mjs";
 import MemberModel from "../models/member.model.mjs";
+import RetroBoardModel from "../models/board.model.mjs";
 import { validateFields, santizeId } from "../utils/validate.mjs";
 
 
@@ -70,15 +71,15 @@ const deleteRetro = async (req, res, next) => {
         if (!fieldValidation.isValid)
             return res.status(400).json({ message: fieldValidation.message });
 
-
         const retro = await RetroModel.findById(retroId);
         if (!retro)
             return res.status(404).json({ message: "Retro not found" });
 
         const group = await GroupModel.findById(retro.group);
-        if (group.createdBy.toString() !== req.currentUser)
-            return res.status(401).json({ message: "You are not authorized to delete this retro" });
+        if (group.createdBy.toString() !== req.currentUser.toString())
+            return res.status(403).json({ message: "You are not authorized to delete this retro" });
 
+        await RetroBoardModel.deleteMany({ retroId: retroId });
         await RetroModel.findByIdAndDelete(retroId);
         return res.status(204).send();
     } catch (error) {

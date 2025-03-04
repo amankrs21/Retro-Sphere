@@ -2,6 +2,7 @@ import UserModel from "../models/user.model.mjs";
 import GroupModel from "../models/group.model.mjs";
 import RetroModel from "../models/retro.model.mjs";
 import MemberModel from "../models/member.model.mjs";
+import RetroBoardModel from "../models/board.model.mjs";
 import { validateFields } from "../utils/validate.mjs";
 
 
@@ -196,7 +197,13 @@ const deleteGroup = async (req, res, next) => {
             return res.status(401).json({ message: "You are not authorized to delete this group" });
         }
 
+        const retros = await RetroModel.find({ group: groupId });
+        for (const retro of retros) {
+            await RetroBoardModel.deleteOne({ retroId: retro._id });
+        }
+
         await MemberModel.deleteMany({ group: groupId });
+        await RetroModel.deleteMany({ group: groupId });
         await GroupModel.deleteOne({ _id: groupId });
 
         return res.status(204).send();
