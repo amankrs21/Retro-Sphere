@@ -8,6 +8,9 @@ import { useAuth } from "./useAuth";
 export const useRetroSocket = (retroId) => {
     const [socket, setSocket] = useState(null);
     const [retroData, setRetroData] = useState(null);
+    const [celebrate, setCelebrate] = useState(false);
+    const [popoutEmoji, setPopoutEmoji] = useState(null);
+
     const { token, userData, baseWSURL, isAuthenticated } = useAuth();
 
     useEffect(() => {
@@ -36,6 +39,14 @@ export const useRetroSocket = (retroId) => {
             }
         });
 
+        // handle emoji pop out
+        newSocket.on("emojiPopOut", ({ retroId: updatedRetroId, emoji }) => {
+            if (updatedRetroId === retroId) {
+                setPopoutEmoji(emoji);
+                setTimeout(() => { setPopoutEmoji(null); }, 1000);
+            }
+        });
+
         // handle add review
         newSocket.on("addReview", ({ retroId: updatedRetroId, reviews }) => {
             if (updatedRetroId === retroId) {
@@ -48,6 +59,12 @@ export const useRetroSocket = (retroId) => {
             if (updatedRetroId === retroId) {
                 setRetroData((prev) => ({ ...prev, reviews }));
             }
+        });
+
+        // handle complete retro
+        newSocket.on("completeRetro", () => {
+            setCelebrate(true);
+            setTimeout(() => { setCelebrate(false); }, 8000);
         });
 
         return () => newSocket.disconnect();
@@ -69,7 +86,12 @@ export const useRetroSocket = (retroId) => {
         socket?.emit("updateReview", { column, comment, index, email: userData?.email });
     };
 
+    // complete retro
+    const completeRetro = () => {
+        socket?.emit("completeRetro");
+    };
+
 
     // return the data and functions
-    return { retroData, updateMood, addReview, updateReview };
+    return { retroData, celebrate, popoutEmoji, updateMood, addReview, updateReview, completeRetro };
 };

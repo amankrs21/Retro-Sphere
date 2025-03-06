@@ -50,6 +50,7 @@ export function setupSocket(io) {
             const response = await updateMood(retroId, data);
             if (response) {
                 io.emit("updateMood", { retroId, moods: response });
+                io.emit("emojiPopOut", { retroId, emoji: data.emoji });
             }
         });
 
@@ -69,6 +70,12 @@ export function setupSocket(io) {
             if (response) {
                 io.emit("updateReview", { retroId, reviews: response });
             }
+        });
+
+
+        // handle complete retro
+        socket.on("completeRetro", async () => {
+            io.emit("completeRetro", { retroId });
         });
     });
 }

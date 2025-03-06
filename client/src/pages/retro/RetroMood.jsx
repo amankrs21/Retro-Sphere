@@ -24,6 +24,8 @@ export default function RetroMood({ moods, isCompleted, updateMood }) {
 
     const onMoodUpdate = (emoji) => {
         if (isCompleted) return;
+        if (curEmoji === emoji) return;
+
         setCurEmoji(emoji);
         updateMood(emoji);
     };
