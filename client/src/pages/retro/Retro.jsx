@@ -15,8 +15,10 @@ export default function Retro() {
     const locaData = JSON.parse(localStorage.getItem('retroData') || '{}');
 
     useEffect(() => {
-        if (!locaData?.retros?.length) return;
-    }, [locaData]);
+        if (!locaData?.retros?.length) {
+            navigate('/home', { replace: true });
+        }
+    }, [locaData, navigate]);
 
     return (
         <Container maxWidth="lg">

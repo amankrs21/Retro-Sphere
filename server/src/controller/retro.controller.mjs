@@ -40,20 +40,24 @@ const getRetroData = async (req, res, next) => {
     try {
         let { retroId } = req.params;
         retroId = santizeId(retroId);
+        if (!retroId)
+            return res.status(404).json({ message: "Invalid path" });
+
         const fieldValidation = validateFields({ retroId });
         if (!fieldValidation.isValid)
             return res.status(400).json({ message: fieldValidation.message });
 
         const retro = await RetroModel.findById(retroId);
         if (!retro)
-            return null;
+            return res.status(404).json({ message: "Invalid Path" });
 
         const group = await GroupModel.findById(retro.group);
         const members = await MemberModel.find({ group: group._id }).populate("user", "name email");
         const users = members.map(member => member.user._id);
 
-        // if (!users.includes(req.currentUser))
-        //     return res.status(404).json({ message: "Invalid Path" });
+        if (!users.map(id => id.toString()).includes(req.currentUser.toString())) {
+            return res.status(404).json({ message: "Invalid Path" });
+        }
 
         return res.status(200).json({ retro, group, users });
     } catch (error) {

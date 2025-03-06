@@ -4,7 +4,9 @@ import { toast } from 'react-toastify';
 import Typewriter from "typewriter-effect";
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Typography, Container, Divider, Card, Button } from '@mui/material';
+import {
+    Typography, Container, Divider, Card, Button
+} from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 import './Retro.css';
@@ -13,6 +15,8 @@ import RetroReview from './RetroReview';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoading } from '../../hooks/useLoading';
 import { useRetroSocket } from '../../hooks/useRetroSocket';
+import EmojiPopOut from '../../components/EmojiPopOut';
+import Celebration from '../../components/Celebration';
 
 
 // RetroBoard page component
@@ -33,6 +37,7 @@ export default function RetroBoard() {
         }
 
         const fetchIntialData = async () => {
+            if (retroId.length < 20) return navigate('/retro', { replace: true });
             try {
                 setLoading(true);
                 const response = await http.get(`/retro/${retroId}`);
@@ -44,11 +49,7 @@ export default function RetroBoard() {
                 }
             } catch (error) {
                 console.error(error);
-                if (error?.response?.data?.message === 'Invalid Path') {
-                    toast.error('Please select a valid retro board');
-                    navigate('/retro', { replace: true });
-                    return;
-                }
+                navigate('/retro', { replace: true });
                 toast.error(error?.response?.data?.message ?? 'Something went wrong');
             } finally {
                 setLoading(false);
@@ -59,18 +60,15 @@ export default function RetroBoard() {
     }, [http.defaults.headers.common.Authorization, retroId]);
 
 
-    const { retroData, updateMood, addReview, updateReview } = useRetroSocket(retroId);
+    const { retroData, celebrate, popoutEmoji, updateMood, addReview, updateReview, completeRetro } = useRetroSocket(retroId);
 
 
-    const completeRetro = async () => {
+    const markCompleteRetro = async () => {
         try {
             setLoading(true);
             await http.patch(`/retro/status/${retroId}`);
             toast.success('Retro completed successfully');
-            localStorage.removeItem('retroData');
-            setTimeout(() => {
-                navigate('/home', { replace: true });
-            }, 100);
+            completeRetro();
         } catch (error) {
             console.error(error);
             toast.error('Something went wrong');
@@ -84,9 +82,19 @@ export default function RetroBoard() {
         toast.info("Feature coming soon!");
     }
 
+    useEffect(() => {
+        if (celebrate) {
+            localStorage.removeItem('retroData');
+            setTimeout(() => {
+                navigate('/home', { replace: true });
+            }, 9000);
+        }
+    }, [celebrate, navigate]);
 
     return (
         <Container maxWidth="xl">
+            {celebrate && <Celebration />}
+            {popoutEmoji && <EmojiPopOut emoji={popoutEmoji} />}
             <Grid container className="retro-header" spacing={0}>
                 <Grid
                     size={{ xs: 12, md: 5 }}
@@ -136,7 +144,7 @@ export default function RetroBoard() {
             <Divider />
 
             <Card raised elevation={3} sx={{ mt: 1, p: 1 }}>
-                {isCompleted && <Typography align='center' variant='h6' color='success' sx={{ mb: 1 }}>
+                {(isCompleted || celebrate) && <Typography align='center' variant='h6' color='success' sx={{ mb: 1 }}>
                     {rData?.retro?.name} Retrospective has been completed.
                 </Typography>}
                 <Grid container spacing={1}>
@@ -173,9 +181,9 @@ export default function RetroBoard() {
                     />
                 </Grid>
 
-                {!isCompleted &&
+                {(!isCompleted && !celebrate) &&
                     <Button fullWidth variant='contained' color='success' sx={{ mt: 2, mb: 1 }}
-                        onClick={() => completeRetro()}>
+                        onClick={() => markCompleteRetro()}>
                         Complete Retro {rData?.retro?.name}
                     </Button>
                 }
