@@ -44,7 +44,7 @@ export default function RetroBoard() {
                 setRData(response?.data);
                 if (response?.data?.retro?.status === 'completed') {
                     setIsCompleted(true);
-                    // localStorage.removeItem('retroData');
+                    localStorage.removeItem('retroData');
                     toast.info('Retro has been completed, you can view the data but cannot edit.');
                 }
             } catch (error) {
