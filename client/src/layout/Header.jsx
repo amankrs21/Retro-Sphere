@@ -5,7 +5,6 @@ import {
     AppBar, Toolbar, Collapse, Typography, Container, Button, Tooltip, MenuItem,
     IconButton, Menu, Avatar
 } from '@mui/material';
-import AdbIcon from '@mui/icons-material/Adb';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
@@ -51,7 +50,9 @@ export default function Header() {
             {openLogout && <LogoutPop openLogout={openLogout} setOpenLogout={setOpenLogout} />}
             <Container maxWidth="xl">
                 <Toolbar disableGutters variant="dense">
-                    <AdbIcon sx={{ display: { xs: 'none', md: 'flex' } }} />
+                    <Tooltip arrow title="Retro-Sphere" placement="bottom">
+                        <Avatar variant="square" alt="header-icon" src="/chat.png" sx={{ display: { xs: 'none', md: 'flex' } }} />
+                    </Tooltip>
                     <Typography noWrap variant="h6" sx={{ display: { xs: 'none', md: 'flex' } }}>
                         &nbsp;Retro Sphere
                     </Typography>
@@ -81,7 +82,7 @@ export default function Header() {
                         </Button>
                     </Box>
 
-                    <AdbIcon sx={{ display: { xs: 'flex', md: 'none' } }} />
+                    <Avatar variant="square" alt="header-icon" src="/chat.png" sx={{ display: { xs: 'flex', md: 'none' } }} />
                     <Typography noWrap variant="h5" sx={{ display: { xs: 'flex', md: 'none' }, flexGrow: 1 }}>
                         &nbsp;Retro Sphere
                     </Typography>

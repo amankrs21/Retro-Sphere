@@ -15,6 +15,7 @@ import RetroAdd from './RetroAdd';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoading } from '../../hooks/useLoading';
 import { useGetRetroData } from '../../hooks/useGetRetroData';
+import ConfirmPop from '../../components/ConfirmPop';
 
 
 // Home page component
@@ -27,8 +28,10 @@ export default function Home() {
     const { getRetroData } = useGetRetroData();
 
     const [data, setData] = useState(null);
+    const [open, setOpen] = useState(false);
     const [openAdd, setOpenAdd] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
     const [selectedRetro, setSelectedRetro] = useState(null);
 
     const retroOptions = ["Open Retro", "Edit Retro", "Delete Retro"];
@@ -61,22 +64,24 @@ export default function Home() {
         } else if (option === "Edit Retro") {
             toast.info("Feature coming soon!");
         } else if (option === "Delete Retro") {
-            handleDeleteRetro(selectedRetro?._id);
+            setOpen(true);
+            setDeleteId(selectedRetro?._id);
         }
         setAnchorEl(null);
         setSelectedRetro(null);
     };
 
-    const handleDeleteRetro = async (retroId) => {
+    const handleDeleteRetro = async () => {
         try {
             setLoading(true);
-            await http.delete(`/retro/delete/${retroId}`);
+            await http.delete(`/retro/delete/${deleteId}`);
             handleFetchData();
             toast.success("Retro deleted successfully!");
         } catch (error) {
             toast.error(error.response?.data?.message || "An error occurred. Please try again later.");
             console.error(error);
         } finally {
+            setOpen(false);
             setLoading(false);
         }
     }
@@ -85,6 +90,7 @@ export default function Home() {
     return (
         <Container maxWidth="xl">
             {openAdd !== null && <RetroAdd openAdd={openAdd} setOpenAdd={setOpenAdd} />}
+            {open && <ConfirmPop open={open} setOpen={setOpen} confirmAction={handleDeleteRetro} />}
             <Typography variant="h4" align="center" gutterBottom>
                 <span className="landing-wave" role="img" aria-labelledby="wave">👋</span>&nbsp;
                 Hello {userData ? userData?.name.split(" ")[0] : "Guest"},&nbsp;
