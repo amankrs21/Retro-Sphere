@@ -4,7 +4,9 @@ import { toast } from 'react-toastify';
 import Typewriter from "typewriter-effect";
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Typography, Container, Divider, Card, Button } from '@mui/material';
+import {
+    Typography, Container, Divider, Card, Button
+} from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
 import './Retro.css';
@@ -33,22 +35,19 @@ export default function RetroBoard() {
         }
 
         const fetchIntialData = async () => {
+            if (retroId.length < 20) return navigate('/retro', { replace: true });
             try {
                 setLoading(true);
                 const response = await http.get(`/retro/${retroId}`);
                 setRData(response?.data);
                 if (response?.data?.retro?.status === 'completed') {
                     setIsCompleted(true);
-                    localStorage.removeItem('retroData');
+                    // localStorage.removeItem('retroData');
                     toast.info('Retro has been completed, you can view the data but cannot edit.');
                 }
             } catch (error) {
                 console.error(error);
-                if (error?.response?.data?.message === 'Invalid Path') {
-                    toast.error('Please select a valid retro board');
-                    navigate('/retro', { replace: true });
-                    return;
-                }
+                navigate('/retro', { replace: true });
                 toast.error(error?.response?.data?.message ?? 'Something went wrong');
             } finally {
                 setLoading(false);
