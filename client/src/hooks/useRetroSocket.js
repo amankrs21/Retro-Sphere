@@ -26,14 +26,12 @@ export const useRetroSocket = (retroId) => {
 
         // handle initial data
         newSocket.on("initialData", (data) => {
-            console.log("GOT INITIAL DATA:", data);
             setRetroData(data);
         });
 
         // handle update mood
         newSocket.on("updateMood", ({ retroId: updatedRetroId, moods }) => {
             if (updatedRetroId === retroId) {
-                console.log("GOT UPDATED EMOJI DATA");
                 setRetroData((prev) => ({ ...prev, moods }));
             }
         });
@@ -41,7 +39,6 @@ export const useRetroSocket = (retroId) => {
         // handle add review
         newSocket.on("addReview", ({ retroId: updatedRetroId, reviews }) => {
             if (updatedRetroId === retroId) {
-                console.log("GOT ADD REVIEW DATA");
                 setRetroData((prev) => ({ ...prev, reviews }));
             }
         });
@@ -49,7 +46,6 @@ export const useRetroSocket = (retroId) => {
         // handle update review
         newSocket.on("updateReview", ({ retroId: updatedRetroId, reviews }) => {
             if (updatedRetroId === retroId) {
-                console.log("GOT UPDATE REVIEW DATA");
                 setRetroData((prev) => ({ ...prev, reviews }));
             }
         });
