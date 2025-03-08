@@ -9,12 +9,13 @@ import {
 } from '@mui/material';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 
-import './Retro.css';
-import RetroMood from './RetroMood';
-import RetroReview from './RetroReview';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoading } from '../../hooks/useLoading';
 import { useRetroSocket } from '../../hooks/useRetroSocket';
+
+import './Retro.css';
+import RetroMood from './RetroMood';
+import RetroReview from './RetroReview';
 import EmojiPopOut from '../../components/EmojiPopOut';
 import Celebration from '../../components/Celebration';
 
@@ -78,9 +79,32 @@ export default function RetroBoard() {
     };
 
 
-    const exportRetroData = () => {
-        toast.info("Feature coming soon!");
-    }
+    const exportRetroData = async () => {
+        try {
+            setLoading(true);
+            const response = await http.get(`/retro/export/${retroId}`, { responseType: "blob" });
+            const blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            });
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `retro_${rData?.retro?.name}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            toast.success("Retro data exported successfully");
+        } catch (error) {
+            console.error("Error exporting retro data:", error);
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     useEffect(() => {
         if (celebrate) {

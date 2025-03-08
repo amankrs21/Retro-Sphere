@@ -5,6 +5,7 @@ import Home from './pages/home/Home';
 import Login from './pages/login/Login';
 import Retro from './pages/retro/Retro';
 import Group from './pages/groups/Group';
+import Account from './pages/account/Account';
 import RetroBoard from './pages/retro/RetroBoard';
 import ServerUnavl from './pages/503/ServerUnavl';
 import PageNotFound from './pages/404/PageNotFound';
@@ -38,6 +39,7 @@ export default function Router() {
                         <Route path='/group' element={<Group />} />
                         <Route path="/retro" element={<Retro />} />
                         <Route path='/retro/:id' element={<RetroBoard />} />
+                        <Route path='/account' element={<Account />} />
                     </Route>
                 </Routes>
             </AuthProvider>

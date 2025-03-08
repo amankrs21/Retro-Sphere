@@ -1,5 +1,5 @@
 import express from "express";
-import { completeRetro, createRetro, deleteRetro, getRetroData } from "../controller/retro.controller.mjs";
+import { completeRetro, createRetro, deleteRetro, exportRetro, getRetroData } from "../controller/retro.controller.mjs";
 
 
 const retroRoute = express.Router();
@@ -16,6 +16,9 @@ retroRoute.delete("/delete/:retroId", deleteRetro);
 
 // mark as completed route
 retroRoute.patch("/status/:retroId", completeRetro);
+
+// export retro to excel route
+retroRoute.get("/export/:retroId", exportRetro);
 
 
 // exporting the retroRoute
