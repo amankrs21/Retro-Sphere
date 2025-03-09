@@ -50,8 +50,14 @@ export default function Header() {
             {openLogout && <LogoutPop openLogout={openLogout} setOpenLogout={setOpenLogout} />}
             <Container maxWidth="xl">
                 <Toolbar disableGutters variant="dense">
-                    <Tooltip arrow title="Retro-Sphere" placement="bottom">
-                        <Avatar variant="square" alt="header-icon" src="/chat.png" sx={{ display: { xs: 'none', md: 'flex' } }} />
+                    <Tooltip arrow placement="bottom" title="Click to refresh">
+                        <Avatar
+                            src="/chat.png"
+                            variant="square"
+                            alt="header-icon"
+                            onClick={() => { window.location.reload() }}
+                            sx={{ display: { xs: 'none', md: 'flex', cursor: 'pointer' } }}
+                        />
                     </Tooltip>
                     <Typography noWrap variant="h6" sx={{ display: { xs: 'none', md: 'flex' } }}>
                         &nbsp;Retro Sphere
@@ -88,7 +94,7 @@ export default function Header() {
                     </Typography>
 
                     <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="User Profile" arrow>
+                        <Tooltip arrow placement="bottom" title="Click to logout">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 <Avatar alt={userData?.name} src={userData?.image} className='profileAvt' />
                             </IconButton>
