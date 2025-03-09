@@ -109,7 +109,7 @@ const completeRetro = async (req, res, next) => {
 
         // const group = await GroupModel.findById(retro.group);
         // if (group.createdBy.toString() !== req.currentUser)
-        //     return res.status(401).json({ message: "You are not authorized to complete this retro" });
+        //     return res.status(403).json({ message: "You are not authorized to complete this retro" });
 
         await RetroModel.findByIdAndUpdate(retroId, { status: "completed" });
         return res.status(204).send();
@@ -133,15 +133,15 @@ const exportRetro = async (req, res, next) => {
             return res.status(404).json({ message: "Retro not found" });
 
         const group = await GroupModel.findById(retro.group);
-        if (group.createdBy.toString() !== req.currentUser.toString())
-            return res.status(401).json({ message: "You are not authorized to export this retro" });
+        // if (group.createdBy.toString() !== req.currentUser.toString())
+        //     return res.status(403).json({ message: "You are not authorized to export this retro" });
 
         const retroData = await RetroBoardModel.findOne({ retroId: retroId });
 
         const workbook = new ExcelJS.Workbook();
         const sheet = workbook.addWorksheet("Retro Data");
 
-        sheet.columns = [{ width: 45 }, { width: 45 }, { width: 45 }, { width: 45 }];
+        sheet.columns = [{ width: 43 }, { width: 43 }, { width: 43 }, { width: 43 }];
 
         const sheetHeader = `Retro Name: ${retro.name} [Group: ${group.name}] (Created on ${new Date(retro.createdAt).toLocaleString()})`;
         const hStyle = sheet.addRow([sheetHeader]);

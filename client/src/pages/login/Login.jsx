@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import LoginIcon from '@mui/icons-material/Login';
+import TokenIcon from '@mui/icons-material/Token';
 import GoogleIcon from '@mui/icons-material/Google';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -144,9 +145,13 @@ export default function Login() {
                                 Or continue with
                             </Typography>
 
-                            <Button sx={{ my: 1 }} variant="outlined" color="primary" onClick={googleLogin}>
+                            <Button sx={{ mt: 1 }} variant="outlined" color="primary" onClick={googleLogin}>
                                 <GoogleIcon sx={{ mr: 1 }} />
                                 Login with Google
+                            </Button>
+                            <Button sx={{ my: 1 }} variant="outlined" color="primary">
+                                <TokenIcon sx={{ mr: 1 }} />
+                                Login with SSO
                             </Button>
                         </Grid>
                     </Box>
