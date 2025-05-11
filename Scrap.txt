@@ -39,41 +39,25 @@ server/
 ├── .env                  # Environment variables
 └── .gitignore            # Ignored files and folders
 
+---------------------------------------------------------------
+if you want to you different image on every hit-
+https://random.imagecdn.app/v1/image?width=1366&height=768
+---------------------------------------------------------------
 
 
-=> Retro JSON format
-{
-  "emojis": {
-    "A": {
-      "users": ["user1@email.com","user2@email.com","user3@email.com"]
-    },
-    "B": {
-      "users": ["user4@email.com"]
-    },
-    "C": {
-        "users": []
-    },
-    "D": {
-      "users": ["user5@email.com","user6@email.com"]
-    },
-    "E": {
-      "users": ["user7@email.com"]
-    }
-  },
-  "comments": {
-    "startDoing": [
-      {
-        "comment": "Start Doing Text",
-        "createdBy": "user1@email.com"
-      }
-    ],
-    "stopDoing": [
-      {
-        "comment": "Stop Doing Text",
-        "createdBy": "user3@email.com"
-      }
-    ],
-    "continueDoing": [],
-    "appreciation": []
-  }
-}
+---------------------------- [PENDING TASK] ------------------------------------
+review footer file.
+SSO Login funtionality
+--------------------------------------------------------------------------------
+
+---------------------------- [DONE TASK] ------------------------------------
+[DONE] review all tsx file and either remove or change it to jsx.
+[DONE] Name should be change to backend => server (package.json)
+[DONE] PageNotFound copy need to remove.
+[DONE] Remove the Status from the Groups
+[DONE] ADD Disable funtionality in the retro-board, like one who added can only edit it for other make that field disabled.
+[SOMEWHAT DONE] Use a concept in which use loading till websocket connection.
+[DONE] FIX: Excel Download 401 -> 403
+[DONE] FIX: Width to around 45 -> 43
+[DONE] Reload the page when click on Icon
+--------------------------------------------------------------------------------
